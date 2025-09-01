@@ -10,6 +10,16 @@
       height: 100%;
       width: 100%;
       background-color: #fff;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .chart-wrapper {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -17,16 +27,16 @@
 
     iframe {
       border: none;
-      width: 90vw;
-      height: 90vh;
-      max-width: 1200px;
-      max-height: 900px;
-      box-shadow: 0 0 20px rgba(0,0,0,0.1);
-      border-radius: 8px;
+      width: 800px;
+      height: 600px;
+      transform: scale(2.5); /* Try 2.5 or higher */
+      transform-origin: top left;
     }
   </style>
 </head>
 <body>
-  <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRz9hVP7G-Tm2Ie3z0-Kj1HXg1qSGTJINEWmqVFiL9_BknGwLI0KRITqyA3NWJkzp8jFUXqiYRIK3uj/pubchart?oid=880450610&format=interactive" allowfullscreen></iframe>
+  <div class="chart-wrapper">
+    <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRz9hVP7G-Tm2Ie3z0-Kj1HXg1qSGTJINEWmqVFiL9_BknGwLI0KRITqyA3NWJkzp8jFUXqiYRIK3uj/pubchart?oid=880450610&format=interactive" allowfullscreen></iframe>
+  </div>
 </body>
 </html>
