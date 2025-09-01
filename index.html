@@ -26,13 +26,25 @@
       box-shadow: 0 0 30px rgba(0,0,0,0.2);
       display: inline-block;
     }
-    
+
     iframe {
       border: none;
-      width: 1000px; /* Set to your chart's native width */
-      height: 500px; /* Set to your chart's native height */
+      width: 100%;
+      max-width: 1200px; /* Default for large screens */
+      height: 500px;
       border-radius: 8px;
+      display: block;
+      margin: 0 auto; /* Center horizontally */
     }
+    
+    /* For smaller screens like phones */
+    @media (max-width: 600px) {
+      iframe {
+        max-width: 800px;
+        height: 500px; /* Optional: scale height down too */
+      }
+    }
+
     
   </style>
 </head>
