@@ -2,24 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Live Chart</title>
+  <title>Colorful Chart Frame</title>
   <style>
     html, body {
       margin: 0;
       padding: 0;
       height: 100%;
       width: 100%;
-      background-color: #fff;
-      overflow: hidden;
+      background: radial-gradient(circle at top left, green 0%, transparent 30%),
+                  radial-gradient(circle at bottom left, blue 0%, transparent 30%),
+                  radial-gradient(circle at bottom center, orange 0%, transparent 30%),
+                  radial-gradient(circle at bottom right, blue 0%, transparent 30%);
+      background-color: #ffffff; /* fallback */
       display: flex;
       justify-content: center;
       align-items: center;
     }
 
-    .chart-wrapper {
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
+    .frame {
+      background-color: white;
+      padding: 1rem;
+      border-radius: 12px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.2);
+      max-width: 90vw;
+      max-height: 90vh;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -27,10 +33,9 @@
 
     iframe {
       border: none;
-      width: 800px;
-      height: 600px;
-      transform: scale(2); /* Try 2.5 or higher */
-      transform-origin: top left;
+      width: 100%;
+      height: 100%;
+      border-radius: 8px;
     }
   </style>
 </head>
