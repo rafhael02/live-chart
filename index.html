@@ -10,15 +10,17 @@
       height: 100%;
       width: 100%;
       background-color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       overflow: hidden;
     }
     iframe {
-      position: absolute;
-      top: 0;
-      left: 0;
+      border: none;
       width: 100vw;
       height: 100vh;
-      border: none;
+      transform: scale(1.2); /* You can adjust this value */
+      transform-origin: top left;
     }
   </style>
 </head>
