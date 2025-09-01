@@ -16,12 +16,15 @@
       overflow: hidden;
     }
     .chart-wrapper {
+      display: flex;
+      justify-content: center;
+      align-items: center;
       transform: scale(2); /* Doubles the size */
-      transform-origin: center;
+      transform-origin: center center; /* Keeps it centered */
     }
     iframe {
       border: none;
-      width: 800px; /* Adjust based on your chart's native size */
+      width: 800px; /* Adjust if needed */
       height: 600px;
     }
   </style>
