@@ -29,21 +29,21 @@
 
     iframe {
       border: none;
-      width: 100%;
-      max-width: 1200px; /* Default for large screens */
+      width: 1200px; /* Fixed width for desktop */
       height: 500px;
       border-radius: 8px;
       display: block;
-      margin: 0 auto; /* Center horizontally */
+      margin: 0 auto;
     }
     
-    /* For smaller screens like phones */
-    @media (max-width: 600px) {
+    /* Responsive override for phones */
+    @media (max-width: 800px) {
       iframe {
-        max-width: 800px;
-        height: 500px; /* Optional: scale height down too */
+        width: 800px;
+        height: 400px; /* Optional: adjust height proportionally */
       }
     }
+
 
     
   </style>
