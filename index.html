@@ -10,22 +10,23 @@
       height: 100%;
       width: 100%;
       background-color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
     }
-    .chart-wrapper {
+    .chart-container {
       display: flex;
       justify-content: center;
       align-items: center;
-      transform: scale(2); /* Doubles the size */
-      transform-origin: center center; /* Keeps it centered */
+      height: 100%;
+      width: 100%;
+      padding: 1rem;
+      box-sizing: border-box;
     }
     iframe {
       border: none;
-      width: 800px; /* Adjust if needed */
-      height: 600px;
+      width: 100%;
+      height: 100%;
+      max-width: 1000px;
+      max-height: 800px;
+      aspect-ratio: 4 / 3;
     }
   </style>
 </head>
