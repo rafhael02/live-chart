@@ -15,16 +15,20 @@
       align-items: center;
       overflow: hidden;
     }
+    .chart-wrapper {
+      transform: scale(2); /* Doubles the size */
+      transform-origin: center;
+    }
     iframe {
       border: none;
-      width: 100vw;
-      height: 100vh;
-      transform: scale(1.2); /* You can adjust this value */
-      transform-origin: top left;
+      width: 800px; /* Adjust based on your chart's native size */
+      height: 600px;
     }
   </style>
 </head>
 <body>
-  <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRz9hVP7G-Tm2Ie3z0-Kj1HXg1qSGTJINEWmqVFiL9_BknGwLI0KRITqyA3NWJkzp8jFUXqiYRIK3uj/pubchart?oid=880450610&format=interactive"></iframe>
+  <div class="chart-wrapper">
+    <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRz9hVP7G-Tm2Ie3z0-Kj1HXg1qSGTJINEWmqVFiL9_BknGwLI0KRITqyA3NWJkzp8jFUXqiYRIK3uj/pubchart?oid=880450610&format=interactive"></iframe>
+  </div>
 </body>
 </html>
