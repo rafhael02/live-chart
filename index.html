@@ -129,7 +129,7 @@
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      padding-right: 10px; /* maior padding para não colar na borda */
+      padding-right: 9px; /* maior padding para não colar na borda */
       color: white;
       font-weight: bold;
       font-size: 0.85rem;
@@ -157,6 +157,58 @@
       .counts-section { width: 100%; margin-top: 1rem; }
       .counts-boxes { flex: unset; }
     }
+    @media (max-width: 1000px) and (orientation: landscape) {
+      .main-container {
+        flex-direction: row;      /* mantém horizontal */
+        align-items: flex-start;
+        gap: 1rem;
+        margin: 1rem;
+      }
+    
+      .frame {
+        flex: 1.5;                /* ocupa menos espaço */
+        padding: 0.5rem;
+        min-width: 300px;
+      }
+    
+      iframe {
+        height: 300px;            /* mais compacto */
+      }
+    
+      .counts-section {
+        flex: 1;
+        width: auto;
+        margin-top: 0;
+      }
+    
+      .counts-boxes {
+        flex-direction: row;       /* as caixas ficam lado a lado */
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        justify-content: space-between;
+      }
+    
+      .count-box {
+        flex: 1 1 45%;             /* ocupam menos largura */
+        min-height: 70px;
+        padding: 0.5rem;
+        font-size: 1rem;
+      }
+    
+      .fitness-bar-container {
+        height: 10px;
+      }
+    
+      .fitness-bar {
+        font-size: 0.75rem;
+        padding-right: 6px;
+      }
+    
+      .fitness-label {
+        font-size: 0.8rem;
+      }
+    }
+
   </style>
   <script>
     async function fetchCell(url, elementId, prefix = "") {
