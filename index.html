@@ -88,23 +88,30 @@
     .yellow { background: #ffc107; color: black; }
     .red { background: #dc3545; }
 
-    /* Responsive: stack chart on top and counts below */
+    /* Mobile layout: chart on top, counts below */
     @media (max-width: 1000px) {
+      .main-container {
+        flex-direction: column;
+        align-items: center; /* center the chart and counts */
+      }
+    
       .frame {
         width: 100%;
-        height: auto; /* let the iframe expand naturally */
+        height: auto; /* allow chart to define its height */
       }
     
       iframe {
-        height: 500px; /* or whatever the chart’s ideal height is */
+        width: 100%;
+        height: 500px; /* chart height */
       }
     
       .counts-section {
         width: 100%;
+        margin-top: 1rem; /* optional spacing below chart */
       }
     
       .counts-boxes {
-        flex: unset;
+        flex: unset; /* allow boxes to stack naturally */
       }
     }
   </style>
