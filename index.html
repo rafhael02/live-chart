@@ -157,39 +157,45 @@
       .counts-section { width: 100%; margin-top: 1rem; }
       .counts-boxes { flex: unset; }
     }
+    
     @media (max-width: 1000px) and (orientation: landscape) {
       .main-container {
-        flex-direction: row;      /* mantém horizontal */
-        align-items: flex-start;
+        flex-direction: row;
+        align-items: center; /* centraliza verticalmente */
         gap: 1rem;
         margin: 1rem;
       }
     
       .frame {
-        flex: 1.5;                /* ocupa menos espaço */
+        flex: 1.5;
         padding: 0.5rem;
         min-width: 300px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* centraliza o conteúdo interno */
       }
     
       iframe {
-        height: 300px;            /* mais compacto */
+        height: 300px; 
       }
     
       .counts-section {
         flex: 1;
         width: auto;
-        margin-top: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center; /* centraliza verticalmente */
       }
     
       .counts-boxes {
-        flex-direction: row;       /* as caixas ficam lado a lado */
+        flex-direction: row;
         flex-wrap: wrap;
         gap: 0.5rem;
         justify-content: space-between;
       }
     
       .count-box {
-        flex: 1 1 45%;             /* ocupam menos largura */
+        flex: 1 1 45%;
         min-height: 70px;
         padding: 0.5rem;
         font-size: 1rem;
