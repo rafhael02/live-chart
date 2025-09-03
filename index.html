@@ -90,14 +90,13 @@
 
     /* Responsive: stack chart on top and counts below */
     @media (max-width: 1000px) {
-      .main-container {
-        flex-direction: column;
-        align-items: center;
-      }
-    
       .frame {
         width: 100%;
-        height: 800px; /* fixed chart height for mobile */
+        height: auto; /* let the iframe expand naturally */
+      }
+    
+      iframe {
+        height: 500px; /* or whatever the chart’s ideal height is */
       }
     
       .counts-section {
@@ -108,7 +107,6 @@
         flex: unset;
       }
     }
-    
   </style>
   <script>
     async function fetchCell(url, elementId) {
