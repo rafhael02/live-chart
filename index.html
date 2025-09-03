@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <title>Colorful Chart Frame</title>
+  <title>Quadro de Cores</title>
   <style>
     html, body {
       margin: 0;
@@ -54,11 +54,13 @@
       gap: 1rem;
     }
 
-    h2 {
+    h2, h3 {
       margin: 0;
-      font-size: 1.5rem;
       text-align: center;
     }
+
+    h2 { font-size: 1.5rem; }
+    h3 { font-size: 1.2rem; font-weight: normal; }
 
     .counts-boxes {
       flex: 1;
@@ -81,7 +83,7 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      position: relative; /* used for click area */
+      position: relative;
       cursor: pointer;
     }
 
@@ -103,7 +105,6 @@
       100% { opacity: 0; transform: translateY(-120px) scale(0.8); }
     }
 
-    /* Mobile layout: chart on top, counts below */
     @media (max-width: 1000px) {
       .main-container {
         flex-direction: column;
@@ -131,7 +132,7 @@
     }
   </style>
   <script>
-    async function fetchCell(url, elementId) {
+    async function fetchCell(url, elementId, prefix = "") {
       try {
         const response = await fetch(url);
         let text = await response.text();
@@ -139,13 +140,21 @@
         if (text.startsWith('"') && text.endsWith('"')) {
           text = text.slice(1, -1);
         }
-        document.getElementById(elementId).textContent = text;
+        document.getElementById(elementId).textContent = prefix + text;
       } catch (e) {
-        console.error("Error fetching cell:", e);
+        console.error("Erro ao buscar célula:", e);
       }
     }
 
     function updateCounts() {
+      // geração
+      fetchCell(
+        "https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=O2",
+        "geracao-atual",
+        "Geração Atual: "
+      );
+
+      // contagens
       fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=O2", "blue-count");
       fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=P2", "green-count");
       fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=Q2", "yellow-count");
@@ -153,7 +162,7 @@
     }
 
     function spawnEmojis(boxId, emoji) {
-      const count = Math.floor(Math.random() * 3) + 3; // 3-5 emojis
+      const count = Math.floor(Math.random() * 3) + 3;
       const box = document.getElementById(boxId);
       const rect = box.getBoundingClientRect();
     
@@ -162,14 +171,11 @@
         el.className = "emoji";
         el.textContent = emoji;
     
-        // spawn anywhere inside the box width
         const x = rect.left + Math.random() * rect.width;
         const y = rect.top + window.scrollY;
     
         el.style.left = x + "px";
         el.style.top = y + "px";
-    
-        // vary animation duration for natural look
         el.style.animationDuration = (1.5 + Math.random() * 1) + "s";
     
         document.body.appendChild(el);
@@ -177,7 +183,6 @@
         setTimeout(() => el.remove(), 2000);
       }
     }
-
 
     window.onload = () => {
       updateCounts();
@@ -204,12 +209,13 @@
     </div>
 
     <div class="counts-section">
-      <h2>Current Count</h2>
+      <h2 id="geracao-atual">Geração Atual: --</h2>
+      <h3>Contagem Atual</h3>
       <div class="counts-boxes">
-        <div class="count-box blue" id="blue-box">Blue<br><span id="blue-count">--</span></div>
-        <div class="count-box green" id="green-box">Green<br><span id="green-count">--</span></div>
-        <div class="count-box yellow" id="yellow-box">Yellow<br><span id="yellow-count">--</span></div>
-        <div class="count-box red" id="red-box">Red<br><span id="red-count">--</span></div>
+        <div class="count-box blue" id="blue-box">Azul<br><span id="blue-count">--</span></div>
+        <div class="count-box green" id="green-box">Verde<br><span id="green-count">--</span></div>
+        <div class="count-box yellow" id="yellow-box">Amarelo<br><span id="yellow-count">--</span></div>
+        <div class="count-box red" id="red-box">Vermelho<br><span id="red-count">--</span></div>
       </div>
     </div>
   </div>
