@@ -81,6 +81,9 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
+      position: relative; /* needed for emoji positioning */
+      cursor: pointer;    /* indicates clickability */
+      overflow: hidden;   /* hide emojis outside box */
     }
 
     .blue { background: #007BFF; }
@@ -88,30 +91,43 @@
     .yellow { background: #ffc107; color: black; }
     .red { background: #dc3545; }
 
+    .emoji {
+      position: absolute;
+      font-size: 1.5rem;
+      animation: floatUp 2s ease-out forwards;
+      pointer-events: none;
+    }
+
+    @keyframes floatUp {
+      0%   { opacity: 1; transform: translateY(0) scale(1); }
+      50%  { opacity: 0.8; transform: translateY(-40px) scale(1.2); }
+      100% { opacity: 0; transform: translateY(-80px) scale(0.8); }
+    }
+
     /* Mobile layout: chart on top, counts below */
     @media (max-width: 1000px) {
       .main-container {
         flex-direction: column;
-        align-items: center; /* center the chart and counts */
+        align-items: center;
       }
-    
+
       .frame {
         width: 100%;
-        height: auto; /* allow chart to define its height */
+        height: auto;
       }
-    
+
       iframe {
         width: 100%;
-        height: 500px; /* chart height */
+        height: 500px;
       }
-    
+
       .counts-section {
         width: 100%;
-        margin-top: 1rem; /* optional spacing below chart */
+        margin-top: 1rem;
       }
-    
+
       .counts-boxes {
-        flex: unset; /* allow boxes to stack naturally */
+        flex: unset;
       }
     }
   </style>
@@ -121,12 +137,9 @@
         const response = await fetch(url);
         let text = await response.text();
         text = text.trim();
-
-        // Remove surrounding quotes if present
         if (text.startsWith('"') && text.endsWith('"')) {
           text = text.slice(1, -1);
         }
-
         document.getElementById(elementId).textContent = text;
       } catch (e) {
         console.error("Error fetching cell:", e);
@@ -140,9 +153,36 @@
       fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=R2", "red-count");
     }
 
+    // spawn multiple emojis per click
+    function spawnEmojis(boxId, emoji) {
+      const count = Math.floor(Math.random() * 3) + 3; // 3-5 emojis
+      for (let i = 0; i < count; i++) {
+        const box = document.getElementById(boxId);
+        const el = document.createElement("div");
+        el.className = "emoji";
+        el.textContent = emoji;
+        el.style.left = Math.random() * 70 + "%"; // random horizontal start
+        el.style.animationDuration = (1.5 + Math.random() * 1) + "s"; // slightly different speeds
+        box.appendChild(el);
+        setTimeout(() => el.remove(), 2000);
+      }
+    }
+
     window.onload = () => {
       updateCounts();
       setInterval(updateCounts, 10000);
+
+      const emojis = {
+        blue: "💙",
+        green: "💚",
+        yellow: "💛",
+        red: "❤️"
+      };
+
+      Object.keys(emojis).forEach(color => {
+        document.getElementById(color + "-box")
+          .addEventListener("click", () => spawnEmojis(color + "-box", emojis[color]));
+      });
     };
   </script>
 </head>
@@ -155,10 +195,10 @@
     <div class="counts-section">
       <h2>Current Count</h2>
       <div class="counts-boxes">
-        <div class="count-box blue">Blue<br><span id="blue-count">--</span></div>
-        <div class="count-box green">Green<br><span id="green-count">--</span></div>
-        <div class="count-box yellow">Yellow<br><span id="yellow-count">--</span></div>
-        <div class="count-box red">Red<br><span id="red-count">--</span></div>
+        <div class="count-box blue" id="blue-box">Blue<br><span id="blue-count">--</span></div>
+        <div class="count-box green" id="green-box">Green<br><span id="green-count">--</span></div>
+        <div class="count-box yellow" id="yellow-box">Yellow<br><span id="yellow-count">--</span></div>
+        <div class="count-box red" id="red-box">Red<br><span id="red-count">--</span></div>
       </div>
     </div>
   </div>
