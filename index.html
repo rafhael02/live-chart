@@ -127,6 +127,12 @@
       transition: width 0.5s ease, background-color 0.5s ease;
     }
 
+    .fitness-label {
+      font-style: italic;
+      font-size: 0.9rem;
+      margin-top: 2px;
+    }
+
     .emoji {
       position: absolute;
       font-size: 1.5rem;
@@ -182,6 +188,9 @@
     }
 
     async function updateCountsAndFitness() {
+      // geração
+      await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=N2", "geracao-atual", "Geração Atual: ");
+
       // contagens
       await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=O2", "blue-count");
       await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=P2", "green-count");
@@ -265,18 +274,22 @@
         <div class="count-box blue" id="blue-box">
           Azul<br><span id="blue-count">--</span>
           <div class="fitness-bar-container"><div class="fitness-bar" id="blue-fitness"></div></div>
+          <div class="fitness-label">Força (fitness)</div>
         </div>
         <div class="count-box green" id="green-box">
           Verde<br><span id="green-count">--</span>
           <div class="fitness-bar-container"><div class="fitness-bar" id="green-fitness"></div></div>
+          <div class="fitness-label">Força (fitness)</div>
         </div>
         <div class="count-box yellow" id="yellow-box">
           Amarelo<br><span id="yellow-count">--</span>
           <div class="fitness-bar-container"><div class="fitness-bar" id="yellow-fitness"></div></div>
+          <div class="fitness-label">Força (fitness)</div>
         </div>
         <div class="count-box red" id="red-box">
           Vermelho<br><span id="red-count">--</span>
           <div class="fitness-bar-container"><div class="fitness-bar" id="red-fitness"></div></div>
+          <div class="fitness-label">Força (fitness)</div>
         </div>
       </div>
     </div>
