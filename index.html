@@ -81,9 +81,8 @@
       display: flex;
       flex-direction: column;
       justify-content: center;
-      position: relative; /* needed for emoji positioning */
-      cursor: pointer;    /* indicates clickability */
-      overflow: hidden;   /* hide emojis outside box */
+      position: relative; /* used for click area */
+      cursor: pointer;
     }
 
     .blue { background: #007BFF; }
@@ -101,7 +100,7 @@
     @keyframes floatUp {
       0%   { opacity: 1; transform: translateY(0) scale(1); }
       50%  { opacity: 0.8; transform: translateY(-40px) scale(1.2); }
-      100% { opacity: 0; transform: translateY(-80px) scale(0.8); }
+      100% { opacity: 0; transform: translateY(-120px) scale(0.8); }
     }
 
     /* Mobile layout: chart on top, counts below */
@@ -153,17 +152,19 @@
       fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=R2", "red-count");
     }
 
-    // spawn multiple emojis per click
     function spawnEmojis(boxId, emoji) {
       const count = Math.floor(Math.random() * 3) + 3; // 3-5 emojis
+      const box = document.getElementById(boxId);
+      const rect = box.getBoundingClientRect();
+
       for (let i = 0; i < count; i++) {
-        const box = document.getElementById(boxId);
         const el = document.createElement("div");
         el.className = "emoji";
         el.textContent = emoji;
-        el.style.left = Math.random() * 70 + "%"; // random horizontal start
-        el.style.animationDuration = (1.5 + Math.random() * 1) + "s"; // slightly different speeds
-        box.appendChild(el);
+        el.style.left = (rect.left + rect.width / 2 + (Math.random() * 40 - 20)) + "px";
+        el.style.top = (rect.top + window.scrollY) + "px";
+        el.style.animationDuration = (1.5 + Math.random() * 1) + "s";
+        document.body.appendChild(el);
         setTimeout(() => el.remove(), 2000);
       }
     }
