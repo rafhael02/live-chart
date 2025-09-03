@@ -139,6 +139,32 @@
       50%  { opacity: 0.8; transform: translateY(-40px) scale(1.2); }
       100% { opacity: 0; transform: translateY(-120px) scale(0.8); }
     }
+    
+    @media (max-width: 1000px) and (orientation: portrait) {
+      .main-container {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .frame {
+        width: 100%;
+        height: auto;
+      }
+
+      iframe {
+        width: 100%;
+        height: 500px;
+      }
+
+      .counts-section {
+        width: 100%;
+        margin-top: 1rem;
+      }
+
+      .counts-boxes {
+        flex: unset;
+      }
+    }
   </style>
   <script>
     async function fetchCell(url, elementId, prefix = "") {
@@ -147,7 +173,7 @@
         let text = await response.text();
         text = text.trim();
         if (text.startsWith('"') && text.endsWith('"')) text = text.slice(1, -1);
-        document.getElementById(elementId).textContent = prefix + text;
+        if (elementId) document.getElementById(elementId).textContent = prefix + text;
         return parseFloat(text) || 0;
       } catch (e) {
         console.error("Erro ao buscar célula:", e);
@@ -157,16 +183,16 @@
 
     async function updateCountsAndFitness() {
       // contagens
-      await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=O5", "blue-count");
-      await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=P5", "green-count");
-      await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=Q5", "yellow-count");
-      await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=R5", "red-count");
+      await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=O2", "blue-count");
+      await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=P2", "green-count");
+      await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=Q2", "yellow-count");
+      await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=R2", "red-count");
 
       // último evento
       await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=S2", "last-event", "Último Evento: ");
 
       // fitness
-      const urls = {
+      const fitnessUrls = {
         blue: "https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=O5",
         green: "https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=P5",
         yellow: "https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=Q5",
@@ -174,8 +200,8 @@
       };
 
       let fitness = {};
-      for (const color in urls) {
-        fitness[color] = await fetchCell(urls[color], null);
+      for (const color in fitnessUrls) {
+        fitness[color] = await fetchCell(fitnessUrls[color], null);
       }
 
       const maxFitness = Math.max(...Object.values(fitness), 1);
