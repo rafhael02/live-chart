@@ -36,7 +36,7 @@ async function fetchCell(range, elementId=null, prefix="") {
         text = text.trim();
         if(text.startsWith('"') && text.endsWith('"')) text = text.slice(1,-1);
         if(elementId) document.getElementById(elementId).textContent = prefix+text;
-        return parseFloat(text)||0;
+        return parseFloat(text.replace(",", "."))||0;
     } catch(e){ console.error("Erro fetchCell:",e); return 0;}
 }
 
@@ -45,7 +45,12 @@ async function fetchPopulationHistory(range) {
     try {
         const res = await fetch(baseURL+range);
         const text = await res.text();
-        const rows = text.trim().split("\n").map(line => line.split(",").map(v => parseFloat(v)));
+        const rows = text.trim().split("\n").map(line => {
+            return line.split(",").map(v => {
+                let n = parseFloat(v.replace(/"/g,'').replace(",", "."));
+                return isNaN(n)?0:n;
+            });
+        });
         return rows; // array de [Azul, Verde, Amarelo, Laranja] por geração
     } catch(e){ console.error("Erro fetchPopulationHistory:",e); return []; }
 }
@@ -81,6 +86,13 @@ async function updateData() {
         fetchCell("O5"), fetchCell("P5"), fetchCell("Q5"), fetchCell("R5")
     ]);
 
+    // Atualiza contadores
+    document.getElementById("blue-count").textContent = bluePop;
+    document.getElementById("green-count").textContent = greenPop;
+    document.getElementById("yellow-count").textContent = yellowPop;
+    document.getElementById("orange-count").textContent = orangePop;
+
+    // Atualiza fitness
     updateFitnessBars(blueFit,greenFit,yellowFit,orangeFit);
 }
 
@@ -93,7 +105,8 @@ function drawChart(dataArray){
         hAxis:{title:'Geração'},
         colors:['#007BFF','#28a745','#ffff00','#ff4500'],
         legend:{position:'top'},
-        animation:{duration:500,easing:'out'}
+        animation:{duration:500,easing:'out'},
+        areaOpacity:0.7
     };
     const chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
     chart.draw(data, options);
