@@ -245,8 +245,7 @@
     function refreshGraphs() {
       const graphs = document.querySelectorAll('iframe.desktop-graph, iframe.mobile-graph');
       graphs.forEach(iframe => {
-        const src = iframe.src.split('?')[0]; // limpa query anterior
-        iframe.src = src + '?t=' + new Date().getTime(); // adiciona timestamp
+        iframe.src = iframe.src; // força reload sem alterar o link
       });
     }
   
