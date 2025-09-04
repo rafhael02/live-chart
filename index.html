@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Roda da Evolução</title>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <style>
     html, body {
       margin: 0;
@@ -18,7 +19,6 @@
       justify-content: center;
       align-items: center;
     }
-
     .main-container {
       display: flex;
       gap: 2rem;
@@ -27,7 +27,6 @@
       max-width: 1200px;
       width: 100%;
     }
-
     .frame {
       flex: 2;
       background-color: white;
@@ -36,13 +35,12 @@
       box-shadow: 0 0 30px rgba(0,0,0,0.2);
       display: flex;
       flex-direction: column;
+      align-items: center;
     }
-
-    #chart-div {
+    #chart_div {
       width: 100%;
       height: 400px;
     }
-
     .last-event-box {
       display: flex;
       align-items: center;
@@ -54,7 +52,6 @@
       font-size: 1rem;
       box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
-
     .live-dot {
       height: 12px;
       width: 12px;
@@ -64,7 +61,6 @@
       margin-right: 8px;
       animation: blink 1s infinite;
     }
-
     @keyframes blink { 50% { opacity: 0; } }
 
     .counts-section {
@@ -73,9 +69,7 @@
       flex-direction: column;
       gap: 1rem;
     }
-
     h2 { margin: 0; text-align: center; font-size: 1.5rem; }
-
     .counts-boxes {
       flex: 1;
       display: flex;
@@ -83,7 +77,6 @@
       gap: 1rem;
       justify-content: space-between;
     }
-
     .count-box {
       flex: 1;
       min-height: 80px;
@@ -100,7 +93,6 @@
       position: relative;
       cursor: pointer;
     }
-
     .blue { background: #007BFF; }
     .green { background: #28a745; }
     .yellow { background: #ffff00; color: black; }
@@ -115,7 +107,6 @@
       overflow: hidden;
       position: relative;
     }
-
     .fitness-bar {
       height: 100%;
       width: 0%;
@@ -132,113 +123,69 @@
       font-size: 0.85rem;
       box-sizing: border-box;
     }
-
     .emoji {
       position: absolute;
       font-size: 1.5rem;
       animation: floatUp 2s ease-out forwards;
       pointer-events: none;
     }
-
     @keyframes floatUp {
       0% { opacity: 1; transform: translateY(0) scale(1); }
       50% { opacity: 0.8; transform: translateY(-40px) scale(1.2); }
       100% { opacity: 0; transform: translateY(-120px) scale(0.8); }
     }
-
-    @media (max-width: 1000px) {
-      .main-container { flex-direction: column; }
-      .counts-boxes { flex-direction: row; flex-wrap: wrap; gap: 0.5rem; }
-      .count-box { flex: 1 1 45%; min-height: 70px; padding: 0.5rem; font-size: 1rem; }
-      .fitness-bar-container { height: 10px; }
-      .fitness-bar { font-size: 0.75rem; padding-right: 6px; }
-    }
   </style>
-
-  <!-- Google Charts -->
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-
   <script>
-    google.charts.load('current', {'packages':['corechart']});
+    google.charts.load('current', {packages:['corechart']});
 
-    let chart, chartData, chartOptions;
-
-    async function fetchCell(url) {
+    async function fetchCell(url, elementId, prefix = "") {
       try {
-        const res = await fetch(url);
-        let text = (await res.text()).trim();
-        if (text.startsWith('"') && text.endsWith('"')) text = text.slice(1,-1);
+        const response = await fetch(url);
+        let text = await response.text();
+        text = text.trim();
+        if (text.startsWith('"') && text.endsWith('"')) text = text.slice(1, -1);
+        if (elementId) document.getElementById(elementId).textContent = prefix + text;
         return parseFloat(text) || 0;
-      } catch(e) {
-        console.error("Erro ao buscar célula:", e);
-        return 0;
-      }
+      } catch (e) { console.error("Erro ao buscar célula:", e); return 0; }
     }
 
-    async function updateCountsAndFitness() {
+    async function updateData() {
       const urls = {
         geracao: ["N2","geracao-atual","Geração Atual: "],
         blue: "O2", green: "P2", yellow: "Q2", orange: "R2",
         last: ["S2","last-event","Último Evento: "]
       };
 
-      // Contadores
-      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.geracao[0]}`)
-        .then(val => document.getElementById(urls.geracao[1]).textContent = urls.geracao[2]+val);
-      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.blue}`)
-        .then(val => document.getElementById("blue-count").textContent = val);
-      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.green}`)
-        .then(val => document.getElementById("green-count").textContent = val);
-      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.yellow}`)
-        .then(val => document.getElementById("yellow-count").textContent = val);
-      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.orange}`)
-        .then(val => document.getElementById("orange-count").textContent = val);
-      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.last[0]}`)
-        .then(val => document.getElementById(urls.last[1]).textContent = urls.last[2]+val);
+      const geracao = await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.geracao[0]}`, urls.geracao[1], urls.geracao[2]);
+      const blue = await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.blue}`, null);
+      const green = await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.green}`, null);
+      const yellow = await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.yellow}`, null);
+      const orange = await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.orange}`, null);
+      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.last[0]}`, urls.last[1], urls.last[2]);
 
-      // Fitness
-      const fitnessUrls = { blue: "O5", green: "P5", yellow: "Q5", orange: "R5" };
-      let fitness = {};
-      for (const color in fitnessUrls) {
-        fitness[color] = await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${fitnessUrls[color]}`);
-      }
-      const maxFitness = Math.max(...Object.values(fitness), 1);
-      for (const color in fitness) {
-        const proportion = (fitness[color]/maxFitness)*100;
-        const bar = document.getElementById(color+"-fitness");
-        if(bar) {
-          bar.style.width = proportion+"%";
-          const greenRatio = fitness[color]/maxFitness;
-          const red = Math.floor(255*(1-greenRatio));
-          const green = Math.floor(200*greenRatio+55);
-          bar.style.backgroundColor = `rgb(${red},${green},0)`;
-          bar.textContent = `⚡${Math.round(fitness[color])}`;
-        }
-      }
-
-      // Atualiza gráfico
-      const chartValues = { blue: fitness.blue, green: fitness.green, yellow: fitness.yellow, orange: fitness.orange };
-      drawChart(chartValues);
+      drawChart(blue, green, yellow, orange);
+      updateFitnessBars(blue, green, yellow, orange); // opcional, se tiveres fitness separados
     }
 
-    function drawChart(values) {
-      chartData = google.visualization.arrayToDataTable([
-        ['Cor', 'Fitness', { role: 'style' }],
-        ['Azul', values.blue, 'color: #007BFF'],
-        ['Verde', values.green, 'color: #28a745'],
-        ['Amarelo', values.yellow, 'color: #ffff00'],
-        ['Laranja', values.orange, 'color: #ff4500']
+    function drawChart(blue, green, yellow, orange) {
+      const data = google.visualization.arrayToDataTable([
+        ['Cor', 'Quantidade', { role: 'style' }],
+        ['Azul', blue, 'color: #007BFF'],
+        ['Verde', green, 'color: #28a745'],
+        ['Amarelo', yellow, 'color: #ffff00'],
+        ['Laranja', orange, 'color: #ff4500']
       ]);
 
-      chartOptions = {
-        title: 'Fitness por Cor',
-        legend: { position: 'none' },
+      const options = {
+        title: 'Distribuição por Geração',
+        vAxis: { minValue: 0, maxValue: 200 },
+        legend: 'none',
         bar: { groupWidth: '60%' },
-        vAxis: { minValue: 0 }
+        animation: { duration: 500, easing: 'out' }
       };
 
-      if(!chart) chart = new google.visualization.ColumnChart(document.getElementById('chart-div'));
-      chart.draw(chartData, chartOptions);
+      const chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
+      chart.draw(data, options);
     }
 
     function spawnEmojis(boxId, emoji) {
@@ -248,31 +195,48 @@
       for(let i=0;i<count;i++){
         const el = document.createElement("div");
         el.className="emoji"; el.textContent=emoji;
-        el.style.left = rect.left + Math.random()*rect.width + "px";
-        el.style.top = rect.top + window.scrollY + "px";
+        const x = rect.left + Math.random()*rect.width;
+        const y = rect.top + window.scrollY;
+        el.style.left = x+"px"; el.style.top = y+"px";
         el.style.animationDuration = (1.5 + Math.random()) + "s";
         document.body.appendChild(el);
         setTimeout(()=>el.remove(),2000);
       }
     }
 
-    google.charts.setOnLoadCallback(() => {
-      updateCountsAndFitness();
-      setInterval(updateCountsAndFitness, 10000);
+    function updateFitnessBars(blue, green, yellow, orange) {
+      const fitness = {blue, green, yellow, orange};
+      const max = Math.max(...Object.values(fitness), 1);
+      for(const color in fitness) {
+        const proportion = (fitness[color]/max)*100;
+        const bar = document.getElementById(color+'-fitness');
+        if(bar){
+          bar.style.width = proportion+'%';
+          const greenRatio = fitness[color]/max;
+          const red = Math.floor(255*(1-greenRatio));
+          const g = Math.floor(200*greenRatio+55);
+          bar.style.backgroundColor = `rgb(${red},${g},0)`;
+          bar.textContent = `⚡${Math.round(fitness[color])}`;
+        }
+      }
+    }
+
+    window.onload = () => {
+      google.charts.setOnLoadCallback(updateData);
+      setInterval(updateData, 10000);
 
       const emojis = { blue:"💙", green:"💚", yellow:"💛", orange:"🧡" };
       Object.keys(emojis).forEach(color=>{
         document.getElementById(color+"-box")
           .addEventListener("click",()=>spawnEmojis(color+"-box",emojis[color]));
       });
-    });
+    };
   </script>
 </head>
 <body>
   <div class="main-container">
     <div class="frame">
-      <div id="chart-div"></div>
-
+      <div id="chart_div"></div>
       <div class="last-event-box">
         <div class="live-dot"></div>
         <span id="last-event">Último Evento: --</span>
