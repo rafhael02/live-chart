@@ -129,13 +129,12 @@
       display: flex;
       align-items: center;
       justify-content: flex-end;
-      padding-right: 9px; /* maior padding para não colar na borda */
+      padding-right: 9px;
       color: white;
       font-weight: bold;
       font-size: 0.85rem;
       box-sizing: border-box;
     }
-
 
     .emoji {
       position: absolute;
@@ -150,6 +149,7 @@
       100% { opacity: 0; transform: translateY(-120px) scale(0.8); }
     }
     
+    /* Só aplica no vertical */
     @media (max-width: 1000px) and (orientation: portrait) {
       .main-container { 
         flex-direction: column; 
@@ -163,9 +163,9 @@
       }
     
       iframe {
-        transform: scale(1.5);   /* aumenta o gráfico */
+        transform: scale(1.5);   /* aumenta o gráfico só no vertical */
         transform-origin: top center;
-        height: 65vh;           /* dá espaço extra para não cortar */
+        height: 65vh;
       }
     
       .counts-section { 
@@ -178,11 +178,10 @@
       }
     }
 
-    
     @media (max-width: 1000px) and (orientation: landscape) {
       .main-container {
         flex-direction: row;
-        align-items: center; /* centraliza verticalmente */
+        align-items: center;
         gap: 1rem;
         margin: 1rem;
       }
@@ -193,7 +192,7 @@
         min-width: 300px;
         display: flex;
         flex-direction: column;
-        justify-content: center; /* centraliza o conteúdo interno */
+        justify-content: center;
       }
     
       iframe {
@@ -205,7 +204,7 @@
         width: auto;
         display: flex;
         flex-direction: column;
-        justify-content: center; /* centraliza verticalmente */
+        justify-content: center;
       }
     
       .counts-boxes {
@@ -253,19 +252,13 @@
     }
 
     async function updateCountsAndFitness() {
-      // geração
       await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=N2", "geracao-atual", "Geração Atual: ");
-
-      // contagens
       await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=O2", "blue-count");
       await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=P2", "green-count");
       await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=Q2", "yellow-count");
       await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=R2", "orange-count");
-
-      // último evento
       await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=S2", "last-event", "Último Evento: ");
 
-      // fitness
       const fitnessUrls = {
         blue: "https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=O5",
         green: "https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=P5",
