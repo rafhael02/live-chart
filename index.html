@@ -16,19 +16,25 @@ html, body {
 }
 
 .main-container {
-    display:flex; gap:2rem; align-items:stretch;
-    width:100%; height:100vh; max-width:1200px;
+    display:flex; 
+    gap:2rem; 
+    align-items:center; /* centraliza verticalmente */
+    justify-content:space-between;
+    width:100%; 
+    max-width:none; /* ocupa toda a largura disponível */
+    height:100vh;
+    padding:1rem; /* evita overflow dos botões */
 }
 
 .frame {
-    flex:1;
+    flex:1; 
     background:white;
     padding:1rem;
     border-radius:12px;
     box-shadow:0 0 30px rgba(0,0,0,0.2);
     display:flex;
     flex-direction:column;
-    height:100%;
+    height:calc(100vh - 2rem); /* limita altura para caber os botões */
 }
 
 #chart_div { width:100%; flex:1; min-height:200px; overflow-x:auto; margin-bottom:0.5rem; }
@@ -58,7 +64,7 @@ h2 { margin:0; text-align:center; font-size:1.5rem; }
 /* MOBILE PORTRAIT */
 @media (max-width:1000px) and (orientation:portrait) {
     .main-container { flex-direction:column; align-items:center; margin:0; height:100vh; }
-    .frame { width:95%; height:85%; margin-bottom:1rem; display:flex; flex-direction:column; }
+    .frame { width:95%; height:calc(100vh - 160px); margin-bottom:1rem; display:flex; flex-direction:column; }
     #chart_div { flex:1; min-height:200px; overflow-x:auto; } 
     .counts-section { width:95%; margin-top:auto; } /* botões no fundo */
     .counts-boxes { flex-direction:row; justify-content:space-around; flex-wrap:wrap; }
@@ -148,7 +154,7 @@ function drawChart(data){
         animation: firstDraw ? {duration:500,easing:'out'} : null,
         areaOpacity:0.7,
         tooltip: {isHtml:true},
-        chartArea: {left:50, top:50, right:30, bottom:50, width:'100%', height:'85%'}
+        chartArea: {left:50, top:20, right:20, bottom:60, width:'100%', height:'85%'}
     };
     const chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
     chart.draw(data, options);
