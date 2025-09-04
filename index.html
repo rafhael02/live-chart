@@ -13,11 +13,10 @@
                   radial-gradient(circle at bottom right, blue 0%, transparent 60%),
                   radial-gradient(circle at top right, orange 0%, transparent 90%),
                   radial-gradient(circle at bottom left, yellow 0%, transparent 60%);
-      background-color: #ffffff;
+      font-family: Arial, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-family: Arial, sans-serif;
     }
 
     .main-container {
@@ -41,11 +40,14 @@
 
     iframe {
       border: none;
-      width: 100%;
-      height: 90%;
       border-radius: 8px;
       display: block;
+      width: 100%;
+      height: 90%;
     }
+
+    .desktop-graph { display: block; }
+    .mobile-graph { display: none; }
 
     .last-event-box {
       display: flex;
@@ -107,7 +109,7 @@
 
     .blue { background: #007BFF; }
     .green { background: #28a745; }
-    .yellow { background: #ffffe0; color: black; }
+    .yellow { background: #ffff00; color: black; }
     .orange { background: #ffa500; }
 
     .fitness-bar-container {
@@ -145,97 +147,30 @@
     }
 
     @keyframes floatUp {
-      0%   { opacity: 1; transform: translateY(0) scale(1); }
-      50%  { opacity: 0.8; transform: translateY(-40px) scale(1.2); }
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      50% { opacity: 0.8; transform: translateY(-40px) scale(1.2); }
       100% { opacity: 0; transform: translateY(-120px) scale(0.8); }
     }
-    
+
+    /* Modo mobile portrait */
     @media (max-width: 1000px) and (orientation: portrait) {
-      .main-container {
-        flex-direction: column;
-        align-items: center;
-      }
-    
-      .frame {
-        width: 100%;
-        height: 1000px;
-        overflow-y: hidden;
-      }
-      
-      iframe {
-        width: 100%;
-        height: 100%;
-        transform: scale(2.2); /* ajuste do zoom */
-        transform-origin: top left;
-      }
-    
-      .counts-section {
-        width: 100%;
-        margin-top: 1rem;
-      }
-    
-      .counts-boxes {
-        flex: unset;
-      }
-    }
-    
-    @media (max-width: 1000px) and (orientation: landscape) {
-      .main-container {
-        flex-direction: row;
-        align-items: center;
-        gap: 1rem;
-        margin: 1rem;
-      }
-    
-      .frame {
-        flex: 1.5;
-        padding: 0.5rem;
-        min-width: 300px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-    
-      iframe {
-        height: 300px; 
-      }
-    
-      .counts-section {
-        flex: 1;
-        width: auto;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-    
-      .counts-boxes {
-        flex-direction: row;
-        flex-wrap: wrap;
-        gap: 0.5rem;
-        justify-content: space-between;
-      }
-    
-      .count-box {
-        flex: 1 1 45%;
-        min-height: 70px;
-        padding: 0.5rem;
-        font-size: 1rem;
-      }
-    
-      .fitness-bar-container {
-        height: 10px;
-      }
-    
-      .fitness-bar {
-        font-size: 0.75rem;
-        padding-right: 6px;
-      }
-    
-      .fitness-label {
-        font-size: 0.8rem;
-      }
+      .main-container { flex-direction: column; align-items: center; }
+      .desktop-graph { display: none; }
+      .mobile-graph { display: block; width: 100%; height: 600px; }
+      .counts-section { width: 100%; margin-top: 1rem; }
+      .counts-boxes { flex: unset; }
     }
 
+    /* Modo mobile landscape */
+    @media (max-width: 1000px) and (orientation: landscape) {
+      .main-container { flex-direction: row; align-items: center; gap: 1rem; margin: 1rem; }
+      iframe { height: 300px; }
+      .counts-section { flex: 1; width: auto; display: flex; flex-direction: column; justify-content: center; }
+      .counts-boxes { flex-direction: row; flex-wrap: wrap; gap: 0.5rem; justify-content: space-between; }
+      .count-box { flex: 1 1 45%; min-height: 70px; padding: 0.5rem; font-size: 1rem; }
+      .fitness-bar-container { height: 10px; }
+      .fitness-bar { font-size: 0.75rem; padding-right: 6px; }
+    }
   </style>
   <script>
     async function fetchCell(url, elementId, prefix = "") {
@@ -246,63 +181,56 @@
         if (text.startsWith('"') && text.endsWith('"')) text = text.slice(1, -1);
         if (elementId) document.getElementById(elementId).textContent = prefix + text;
         return parseFloat(text) || 0;
-      } catch (e) {
-        console.error("Erro ao buscar célula:", e);
-        return 0;
-      }
+      } catch (e) { console.error("Erro ao buscar célula:", e); return 0; }
     }
 
     async function updateCountsAndFitness() {
-      await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=N2", "geracao-atual", "Geração Atual: ");
-      await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=O2", "blue-count");
-      await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=P2", "green-count");
-      await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=Q2", "yellow-count");
-      await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=R2", "orange-count");
-      await fetchCell("https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=S2", "last-event", "Último Evento: ");
-
-      const fitnessUrls = {
-        blue: "https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=O5",
-        green: "https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=P5",
-        yellow: "https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=Q5",
-        orange: "https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=R5"
+      const urls = {
+        geracao: ["N2","geracao-atual","Geração Atual: "],
+        blue: "O2", green: "P2", yellow: "Q2", orange: "R2",
+        last: ["S2","last-event","Último Evento: "]
       };
 
+      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.geracao[0]}`, urls.geracao[1], urls.geracao[2]);
+      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.blue}`, "blue-count");
+      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.green}`, "green-count");
+      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.yellow}`, "yellow-count");
+      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.orange}`, "orange-count");
+      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.last[0]}`, urls.last[1], urls.last[2]);
+
+      const fitnessUrls = { blue: "O5", green: "P5", yellow: "Q5", orange: "R5" };
       let fitness = {};
       for (const color in fitnessUrls) {
-        fitness[color] = await fetchCell(fitnessUrls[color], null);
+        fitness[color] = await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${fitnessUrls[color]}`, null);
       }
-
       const maxFitness = Math.max(...Object.values(fitness), 1);
       for (const color in fitness) {
-        const proportion = (fitness[color] / maxFitness) * 100;
-        const bar = document.getElementById(color + "-fitness");
-        if (bar) {
-          bar.style.width = proportion + "%";
-          const greenRatio = fitness[color] / maxFitness;
-          const red = Math.floor(255 * (1 - greenRatio));
-          const green = Math.floor(200 * greenRatio + 55);
-          bar.style.backgroundColor = `rgb(${red}, ${green}, 0)`;
+        const proportion = (fitness[color]/maxFitness)*100;
+        const bar = document.getElementById(color+"-fitness");
+        if(bar) {
+          bar.style.width = proportion+"%";
+          const greenRatio = fitness[color]/maxFitness;
+          const red = Math.floor(255*(1-greenRatio));
+          const green = Math.floor(200*greenRatio+55);
+          bar.style.backgroundColor = `rgb(${red},${green},0)`;
           bar.textContent = `⚡${Math.round(fitness[color])}`;
         }
       }
     }
 
     function spawnEmojis(boxId, emoji) {
-      const count = Math.floor(Math.random() * 3) + 3;
+      const count = Math.floor(Math.random()*3)+3;
       const box = document.getElementById(boxId);
       const rect = box.getBoundingClientRect();
-    
-      for (let i = 0; i < count; i++) {
+      for(let i=0;i<count;i++){
         const el = document.createElement("div");
-        el.className = "emoji";
-        el.textContent = emoji;
-        const x = rect.left + Math.random() * rect.width;
+        el.className="emoji"; el.textContent=emoji;
+        const x = rect.left + Math.random()*rect.width;
         const y = rect.top + window.scrollY;
-        el.style.left = x + "px";
-        el.style.top = y + "px";
-        el.style.animationDuration = (1.5 + Math.random() * 1) + "s";
+        el.style.left = x+"px"; el.style.top = y+"px";
+        el.style.animationDuration = (1.5 + Math.random()) + "s";
         document.body.appendChild(el);
-        setTimeout(() => el.remove(), 2000);
+        setTimeout(()=>el.remove(),2000);
       }
     }
 
@@ -310,10 +238,10 @@
       updateCountsAndFitness();
       setInterval(updateCountsAndFitness, 10000);
 
-      const emojis = { blue: "💙", green: "💚", yellow: "💛", orange: "🧡" };
-      Object.keys(emojis).forEach(color => {
-        document.getElementById(color + "-box")
-          .addEventListener("click", () => spawnEmojis(color + "-box", emojis[color]));
+      const emojis = { blue:"💙", green:"💚", yellow:"💛", orange:"🧡" };
+      Object.keys(emojis).forEach(color=>{
+        document.getElementById(color+"-box")
+          .addEventListener("click",()=>spawnEmojis(color+"-box",emojis[color]));
       });
     };
   </script>
@@ -321,7 +249,12 @@
 <body>
   <div class="main-container">
     <div class="frame">
-      <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRz9hVP7G-Tm2Ie3z0-Kj1HXg1qSGTJINEWmqVFiL9_BknGwLI0KRITqyA3NWJkzp8jFUXqiYRIK3uj/pubchart?oid=880450610&format=interactive" allowfullscreen></iframe>
+      <!-- Gráfico desktop / landscape -->
+      <iframe class="desktop-graph" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRz9hVP7G-Tm2Ie3z0-Kj1HXg1qSGTJINEWmqVFiL9_BknGwLI0KRITqyA3NWJkzp8jFUXqiYRIK3uj/pubchart?oid=880450610&format=interactive" allowfullscreen></iframe>
+
+      <!-- Gráfico mobile vertical -->
+      <iframe class="mobile-graph" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRz9hVP7G-Tm2Ie3z0-Kj1HXg1qSGTJINEWmqVFiL9_BknGwLI0KRITqyA3NWJkzp8jFUXqiYRIK3uj/pubchart?oid=747883766&format=interactive" allowfullscreen></iframe>
+
       <div class="last-event-box">
         <div class="live-dot"></div>
         <span id="last-event">Último Evento: --</span>
