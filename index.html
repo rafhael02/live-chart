@@ -16,7 +16,7 @@
   }
   .main-container { display:flex; gap:2rem; align-items:stretch; margin:2rem; max-width:1200px; width:100%; }
   .frame { flex:2; background:white; padding:1rem; border-radius:12px; box-shadow:0 0 30px rgba(0,0,0,0.2); display:flex; flex-direction:column; align-items:center;}
-  #chart_div { width:100%; height:600px; } /* gráfico maior */
+  #chart_div { width:100%; height:450px; } /* altura ajustada */
   .last-event-box { display:flex; align-items:center; margin-top:0.5rem; padding:0.5rem 1rem; background:#fff3f3; border-radius:8px; font-weight:bold; font-size:1rem; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
   .live-dot { height:12px; width:12px; background:red; border-radius:50%; display:inline-block; margin-right:8px; animation:blink 1s infinite; }
   @keyframes blink { 50% { opacity:0; } }
@@ -95,17 +95,17 @@ async function updateData() {
 
         data.addRow([
             i+1,
-            (blue/total)*100,   `Azul: ${blue} bolas<br>${bluePct}%`,
-            (green/total)*100,  `Verde: ${green} bolas<br>${greenPct}%`,
-            (yellow/total)*100, `Amarelo: ${yellow} bolas<br>${yellowPct}%`,
-            (orange/total)*100, `Laranja: ${orange} bolas<br>${orangePct}%`
+            (blue/total)*100,   `<div style="color:gray">Geração ${i+1}</div><b>Azul: ${blue} (${bluePct}%)</b>`,
+            (green/total)*100,  `<div style="color:gray">Geração ${i+1}</div><b>Verde: ${green} (${greenPct}%)</b>`,
+            (yellow/total)*100, `<div style="color:gray">Geração ${i+1}</div><b>Amarelo: ${yellow} (${yellowPct}%)</b>`,
+            (orange/total)*100, `<div style="color:gray">Geração ${i+1}</div><b>Laranja: ${orange} (${orangePct}%)</b>`
         ]);
     });
 
     drawChart(data);
 
     // População atual
-    const [bluePop,greenPop,yellowPop,orangePop] = await Promise.all([
+    await Promise.all([
         fetchCell("O2","blue-count"), 
         fetchCell("P2","green-count"), 
         fetchCell("Q2","yellow-count"), 
@@ -123,8 +123,8 @@ function drawChart(data){
     const options = {
         title:'Distribuição por Geração (%)',
         isStacked:true,
-        vAxis:{minValue:0,maxValue:100,title:'Proporção (%)'},
-        hAxis:{title:'Geração'},
+        vAxis:{minValue:0,maxValue:100, textPosition:'none'},
+        hAxis:{textPosition:'none'},
         colors:['#007BFF','#28a745','#ffff00','#ff4500'],
         legend:{position:'top'},
         animation:{duration:500,easing:'out'},
