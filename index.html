@@ -18,12 +18,13 @@ html, body {
 .main-container {
     display:flex; 
     gap:2rem; 
-    align-items:center; /* centraliza verticalmente */
+    align-items:center; /* verticalmente */
     justify-content:space-between;
     width:100%; 
-    max-width:none; /* ocupa toda a largura disponível */
+    max-width:1200px;
     height:100vh;
-    padding:1rem; /* evita overflow dos botões */
+    padding:1rem;
+    box-sizing:border-box;
 }
 
 .frame {
@@ -34,10 +35,16 @@ html, body {
     box-shadow:0 0 30px rgba(0,0,0,0.2);
     display:flex;
     flex-direction:column;
-    height:calc(100vh - 2rem); /* limita altura para caber os botões */
+    height:calc(100% - 2rem); /* limita altura */
+    box-sizing:border-box;
 }
 
-#chart_div { width:100%; flex:1; min-height:200px; overflow-x:auto; margin-bottom:0.5rem; }
+#chart_div {
+    width:100%;
+    height: calc(100% - 50px); /* deixa espaço para last-event-box */
+    margin-bottom:0.5rem;
+    overflow-x:auto;
+}
 
 .last-event-box {
     display:flex; align-items:center; padding:0.5rem 1rem; 
@@ -65,7 +72,7 @@ h2 { margin:0; text-align:center; font-size:1.5rem; }
 @media (max-width:1000px) and (orientation:portrait) {
     .main-container { flex-direction:column; align-items:center; margin:0; height:100vh; }
     .frame { width:95%; height:calc(100vh - 160px); margin-bottom:1rem; display:flex; flex-direction:column; }
-    #chart_div { flex:1; min-height:200px; overflow-x:auto; } 
+    #chart_div { height: calc(100% - 50px); }
     .counts-section { width:95%; margin-top:auto; } /* botões no fundo */
     .counts-boxes { flex-direction:row; justify-content:space-around; flex-wrap:wrap; }
     .count-box { flex:1 1 45%; min-height:60px; margin-bottom:0.5rem; }
@@ -90,12 +97,7 @@ async function fetchPopulationHistory(range) {
     try {
         const res = await fetch(baseURL+range);
         const text = await res.text();
-        const rows = text.trim().split("\n").map(line => {
-            return line.split(",").map(v => {
-                let n = parseFloat(v.replace(/"/g,'').replace(",", "."));
-                return isNaN(n)?0:n;
-            });
-        });
+        const rows = text.trim().split("\n").map(line => line.split(",").map(v => parseFloat(v.replace(/"/g,'').replace(",", ".")) || 0));
         return rows;
     } catch(e){ console.error("Erro fetchPopulationHistory:",e); return []; }
 }
@@ -154,7 +156,7 @@ function drawChart(data){
         animation: firstDraw ? {duration:500,easing:'out'} : null,
         areaOpacity:0.7,
         tooltip: {isHtml:true},
-        chartArea: {left:50, top:20, right:20, bottom:60, width:'100%', height:'85%'}
+        chartArea: {left:50, top:20, right:20, bottom:60, width:'100%', height:'100%'}
     };
     const chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
     chart.draw(data, options);
