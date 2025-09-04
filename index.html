@@ -5,7 +5,7 @@
 <title>Roda da Evolução</title>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <style>
-  html, body { 
+html, body { 
     margin:0; padding:0; height:100%; width:100%; 
     background: radial-gradient(circle at top left, green 0%, transparent 60%),
                 radial-gradient(circle at bottom right, blue 0%, transparent 60%),
@@ -13,10 +13,13 @@
                 radial-gradient(circle at bottom left, yellow 0%, transparent 60%);
     font-family: Arial,sans-serif; 
     display:flex; justify-content:center; align-items:center;
-  }
-  .main-container { display:flex; gap:2rem; align-items:stretch; margin:2rem; max-width:1200px; width:100%; }
-  
-  .frame {
+}
+.main-container { 
+    display:flex; gap:2rem; align-items:stretch; margin:2rem; max-width:1200px; width:100%; 
+    flex-wrap: wrap;
+}
+
+.frame {
     flex:2;
     background:white;
     padding:1rem;
@@ -25,27 +28,37 @@
     display:flex;
     flex-direction:column;
     align-items:stretch;
-    height:500px;  /* mantém o tamanho original do frame */
-  }
-  
-  #chart_div {
+    height:500px;
+}
+
+#chart_div {
     width:100%;
     height:100%; 
     margin-bottom:0.5rem;
-  }
+}
 
-  .last-event-box { display:flex; align-items:center; margin-top:0.5rem; padding:0.5rem 1rem; background:#fff3f3; border-radius:8px; font-weight:bold; font-size:1rem; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
-  .live-dot { height:12px; width:12px; background:red; border-radius:50%; display:inline-block; margin-right:8px; animation:blink 1s infinite; }
-  @keyframes blink { 50% { opacity:0; } }
-  .counts-section { flex:1; display:flex; flex-direction:column; gap:1rem; }
-  h2 { margin:0; text-align:center; font-size:1.5rem; }
-  .counts-boxes { flex:1; display:flex; flex-direction:column; gap:1rem; justify-content:space-between; }
-  .count-box { flex:1; min-height:80px; padding:1rem; border-radius:12px; color:white; font-size:1.2rem; text-align:center; font-weight:bold; box-shadow:0 4px 10px rgba(0,0,0,0.2); display:flex; flex-direction:column; justify-content:center; position:relative; cursor:pointer; }
-  .blue { background:#007BFF; } .green { background:#28a745; } .yellow { background:#ffff00; color:black; } .orange { background:#ff4500; }
-  .fitness-bar-container { width:100%; height:16px; background:rgba(0,0,0,0.1); border-radius:8px; margin-top:5px; overflow:hidden; position:relative; }
-  .fitness-bar { height:100%; width:0%; border-radius:8px; transition:width 0.5s ease, background-color 0.5s ease; display:flex; align-items:center; justify-content:flex-end; padding-bottom:1px; padding-right:9px; color:white; font-weight:bold; font-size:0.85rem; box-sizing:border-box; }
-  .emoji { position:absolute; font-size:1.5rem; animation:floatUp 2s ease-out forwards; pointer-events:none; }
-  @keyframes floatUp { 0% { opacity:1; transform:translateY(0) scale(1);} 50% { opacity:0.8; transform:translateY(-40px) scale(1.2);} 100% { opacity:0; transform:translateY(-120px) scale(0.8);} }
+.last-event-box { display:flex; align-items:center; margin-top:0.5rem; padding:0.5rem 1rem; background:#fff3f3; border-radius:8px; font-weight:bold; font-size:1rem; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
+.live-dot { height:12px; width:12px; background:red; border-radius:50%; display:inline-block; margin-right:8px; animation:blink 1s infinite; }
+@keyframes blink { 50% { opacity:0; } }
+
+.counts-section { flex:1; display:flex; flex-direction:column; gap:1rem; }
+h2 { margin:0; text-align:center; font-size:1.5rem; }
+.counts-boxes { flex:1; display:flex; flex-direction:column; gap:1rem; justify-content:space-between; }
+
+.count-box { flex:1; min-height:80px; padding:1rem; border-radius:12px; color:white; font-size:1.2rem; text-align:center; font-weight:bold; box-shadow:0 4px 10px rgba(0,0,0,0.2); display:flex; flex-direction:column; justify-content:center; position:relative; cursor:pointer; }
+.blue { background:#007BFF; } .green { background:#28a745; } .yellow { background:#ffff00; color:black; } .orange { background:#ff4500; }
+.fitness-bar-container { width:100%; height:16px; background:rgba(0,0,0,0.1); border-radius:8px; margin-top:5px; overflow:hidden; position:relative; }
+.fitness-bar { height:100%; width:0%; border-radius:8px; transition:width 0.5s ease, background-color 0.5s ease; display:flex; align-items:center; justify-content:flex-end; padding-bottom:1px; padding-right:9px; color:white; font-weight:bold; font-size:0.85rem; box-sizing:border-box; }
+.emoji { position:absolute; font-size:1.5rem; animation:floatUp 2s ease-out forwards; pointer-events:none; }
+@keyframes floatUp { 0% { opacity:1; transform:translateY(0) scale(1);} 50% { opacity:0.8; transform:translateY(-40px) scale(1.2);} 100% { opacity:0; transform:translateY(-120px) scale(0.8);} }
+
+/* Responsivo */
+@media screen and (max-width:1000px){
+    .main-container { flex-direction:column; }
+    .frame { height:600px; }
+    .counts-section { flex-direction:row; justify-content:center; gap:1rem; }
+    .counts-boxes { flex-direction:row; flex:unset; gap:0.5rem; }
+}
 </style>
 <script>
 google.charts.load('current', {packages:['corechart']});
@@ -84,29 +97,24 @@ async function updateData() {
 
     const data = new google.visualization.DataTable();
     data.addColumn('number', 'Geração');
-    data.addColumn('number', 'Azul');
-    data.addColumn({type: 'string', role: 'tooltip', p:{html:true}});
-    data.addColumn('number', 'Verde');
-    data.addColumn({type: 'string', role: 'tooltip', p:{html:true}});
-    data.addColumn('number', 'Amarelo');
-    data.addColumn({type: 'string', role: 'tooltip', p:{html:true}});
-    data.addColumn('number', 'Laranja');
-    data.addColumn({type: 'string', role: 'tooltip', p:{html:true}});
+    data.addColumn('number', 'Azul'); data.addColumn({type:'string', role:'tooltip', p:{html:true}});
+    data.addColumn('number', 'Verde'); data.addColumn({type:'string', role:'tooltip', p:{html:true}});
+    data.addColumn('number', 'Amarelo'); data.addColumn({type:'string', role:'tooltip', p:{html:true}});
+    data.addColumn('number', 'Laranja'); data.addColumn({type:'string', role:'tooltip', p:{html:true}});
 
     popHist.forEach((row,i)=>{
         const total = row.reduce((a,b)=>a+b,0) || 1;
         const [blue,green,yellow,orange] = row;
-        const bluePct   = ((blue/total)*100).toFixed(1);
-        const greenPct  = ((green/total)*100).toFixed(1);
+        const bluePct = ((blue/total)*100).toFixed(1);
+        const greenPct = ((green/total)*100).toFixed(1);
         const yellowPct = ((yellow/total)*100).toFixed(1);
         const orangePct = ((orange/total)*100).toFixed(1);
-
         data.addRow([
-            i+1,
-            (blue/total)*100,   `<div style="color:gray">Geração ${i+1}</div><b>Azul: ${blue} (${bluePct}%)</b>`,
-            (green/total)*100,  `<div style="color:gray">Geração ${i+1}</div><b>Verde: ${green} (${greenPct}%)</b>`,
-            (yellow/total)*100, `<div style="color:gray">Geração ${i+1}</div><b>Amarelo: ${yellow} (${yellowPct}%)</b>`,
-            (orange/total)*100, `<div style="color:gray">Geração ${i+1}</div><b>Laranja: ${orange} (${orangePct}%)</b>`
+            i, // geração 0
+            (blue/total)*100, `<div style="color:gray">Geração ${i}</div><b>Azul: ${blue} (${bluePct}%)</b>`,
+            (green/total)*100, `<div style="color:gray">Geração ${i}</div><b>Verde: ${green} (${greenPct}%)</b>`,
+            (yellow/total)*100, `<div style="color:gray">Geração ${i}</div><b>Amarelo: ${yellow} (${yellowPct}%)</b>`,
+            (orange/total)*100, `<div style="color:gray">Geração ${i}</div><b>Laranja: ${orange} (${orangePct}%)</b>`
         ]);
     });
 
@@ -122,7 +130,6 @@ async function updateData() {
     const [blueFit,greenFit,yellowFit,orangeFit] = await Promise.all([
         fetchCell("O5"), fetchCell("P5"), fetchCell("Q5"), fetchCell("R5")
     ]);
-
     updateFitnessBars(blueFit,greenFit,yellowFit,orangeFit);
 }
 
@@ -130,21 +137,14 @@ function drawChart(data){
     const options = {
         title:'Distribuição por Geração (%)',
         isStacked:true,
-        vAxis:{minValue:0,maxValue:100, textPosition:'out'}, 
+        vAxis:{minValue:0,maxValue:100, textPosition:'out'},
         hAxis:{textPosition:'out'},
         colors:['#007BFF','#28a745','#ffff00','#ff4500'],
         legend:{position:'top'},
         animation:{duration:500,easing:'out'},
         areaOpacity:0.7,
         tooltip: {isHtml:true},
-        chartArea: {    // controla tamanho efetivo do gráfico dentro do frame
-            left:50,
-            top:50,
-            right:30,
-            bottom:50,
-            width:'90%',
-            height:'85%'
-        }
+        chartArea: {left:50,top:50,right:30,bottom:50,width:'90%',height:'85%'}
     };
     const chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
     chart.draw(data, options);
