@@ -25,14 +25,13 @@
     display:flex;
     flex-direction:column;
     align-items:stretch;
-    height:auto;
+    height:500px;  /* mantém o tamanho original do frame */
   }
   
   #chart_div {
-    width:700px;         /* aumenta a largura do gráfico dentro do frame */
-    height:500px;      /* aumenta a altura do gráfico dentro do frame */
-    overflow:hidden;
-    margin:0 auto 0.5rem auto;
+    width:100%;
+    height:100%; 
+    margin-bottom:0.5rem;
   }
 
   .last-event-box { display:flex; align-items:center; margin-top:0.5rem; padding:0.5rem 1rem; background:#fff3f3; border-radius:8px; font-weight:bold; font-size:1rem; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
@@ -50,7 +49,6 @@
 </style>
 <script>
 google.charts.load('current', {packages:['corechart']});
-
 const baseURL = "https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=";
 
 async function fetchCell(range, elementId=null, prefix="") {
@@ -132,13 +130,21 @@ function drawChart(data){
     const options = {
         title:'Distribuição por Geração (%)',
         isStacked:true,
-        vAxis:{minValue:0,maxValue:100}, 
-        hAxis:{}, 
+        vAxis:{minValue:0,maxValue:100, textPosition:'out'}, 
+        hAxis:{textPosition:'out'},
         colors:['#007BFF','#28a745','#ffff00','#ff4500'],
         legend:{position:'top'},
         animation:{duration:500,easing:'out'},
         areaOpacity:0.7,
-        tooltip: {isHtml:true}
+        tooltip: {isHtml:true},
+        chartArea: {    // controla tamanho efetivo do gráfico dentro do frame
+            left:50,
+            top:50,
+            right:30,
+            bottom:50,
+            width:'90%',
+            height:'85%'
+        }
     };
     const chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
     chart.draw(data, options);
