@@ -38,16 +38,10 @@
       flex-direction: column;
     }
 
-    iframe {
-      border: none;
-      border-radius: 8px;
-      display: block;
+    #chart-div {
       width: 100%;
-      height: 90%;
+      height: 400px;
     }
-
-    .desktop-graph { display: block; }
-    .mobile-graph { display: none; }
 
     .last-event-box {
       display: flex;
@@ -152,43 +146,33 @@
       100% { opacity: 0; transform: translateY(-120px) scale(0.8); }
     }
 
-    /* Portrait mobile */
-    @media (max-width: 1000px) and (orientation: portrait) {
-      .desktop-graph { display: none; }
-      .mobile-graph { display: block; }
-
-      .main-container { flex-direction: column; align-items: center; }
-      .frame { width: 100%; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; }
-      iframe { width: 100%; height: calc(100vw * 1); max-height: 1000px; border-radius: 8px; transform: none; }
-
-      .counts-section { width: 100%; margin-top: 1rem; }
-      .counts-boxes { flex: unset; }
-    }
-
-    /* Landscape mobile */
-    @media (max-width: 1000px) and (orientation: landscape) {
-      .desktop-graph { display: block; }
-      .mobile-graph { display: none; }
-
-      .main-container { flex-direction: row; align-items: center; gap: 1rem; margin: 1rem; }
-      iframe { height: 300px; }
-      .counts-section { flex: 1; width: auto; display: flex; flex-direction: column; justify-content: center; }
-      .counts-boxes { flex-direction: row; flex-wrap: wrap; gap: 0.5rem; justify-content: space-between; }
+    @media (max-width: 1000px) {
+      .main-container { flex-direction: column; }
+      .counts-boxes { flex-direction: row; flex-wrap: wrap; gap: 0.5rem; }
       .count-box { flex: 1 1 45%; min-height: 70px; padding: 0.5rem; font-size: 1rem; }
       .fitness-bar-container { height: 10px; }
       .fitness-bar { font-size: 0.75rem; padding-right: 6px; }
     }
   </style>
+
+  <!-- Google Charts -->
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
   <script>
-    async function fetchCell(url, elementId, prefix = "") {
+    google.charts.load('current', {'packages':['corechart']});
+
+    let chart, chartData, chartOptions;
+
+    async function fetchCell(url) {
       try {
-        const response = await fetch(url);
-        let text = await response.text();
-        text = text.trim();
-        if (text.startsWith('"') && text.endsWith('"')) text = text.slice(1, -1);
-        if (elementId) document.getElementById(elementId).textContent = prefix + text;
+        const res = await fetch(url);
+        let text = (await res.text()).trim();
+        if (text.startsWith('"') && text.endsWith('"')) text = text.slice(1,-1);
         return parseFloat(text) || 0;
-      } catch (e) { console.error("Erro ao buscar célula:", e); return 0; }
+      } catch(e) {
+        console.error("Erro ao buscar célula:", e);
+        return 0;
+      }
     }
 
     async function updateCountsAndFitness() {
@@ -198,17 +182,25 @@
         last: ["S2","last-event","Último Evento: "]
       };
 
-      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.geracao[0]}`, urls.geracao[1], urls.geracao[2]);
-      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.blue}`, "blue-count");
-      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.green}`, "green-count");
-      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.yellow}`, "yellow-count");
-      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.orange}`, "orange-count");
-      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.last[0]}`, urls.last[1], urls.last[2]);
+      // Contadores
+      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.geracao[0]}`)
+        .then(val => document.getElementById(urls.geracao[1]).textContent = urls.geracao[2]+val);
+      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.blue}`)
+        .then(val => document.getElementById("blue-count").textContent = val);
+      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.green}`)
+        .then(val => document.getElementById("green-count").textContent = val);
+      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.yellow}`)
+        .then(val => document.getElementById("yellow-count").textContent = val);
+      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.orange}`)
+        .then(val => document.getElementById("orange-count").textContent = val);
+      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.last[0]}`)
+        .then(val => document.getElementById(urls.last[1]).textContent = urls.last[2]+val);
 
+      // Fitness
       const fitnessUrls = { blue: "O5", green: "P5", yellow: "Q5", orange: "R5" };
       let fitness = {};
       for (const color in fitnessUrls) {
-        fitness[color] = await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${fitnessUrls[color]}`, null);
+        fitness[color] = await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${fitnessUrls[color]}`);
       }
       const maxFitness = Math.max(...Object.values(fitness), 1);
       for (const color in fitness) {
@@ -223,6 +215,30 @@
           bar.textContent = `⚡${Math.round(fitness[color])}`;
         }
       }
+
+      // Atualiza gráfico
+      const chartValues = { blue: fitness.blue, green: fitness.green, yellow: fitness.yellow, orange: fitness.orange };
+      drawChart(chartValues);
+    }
+
+    function drawChart(values) {
+      chartData = google.visualization.arrayToDataTable([
+        ['Cor', 'Fitness', { role: 'style' }],
+        ['Azul', values.blue, 'color: #007BFF'],
+        ['Verde', values.green, 'color: #28a745'],
+        ['Amarelo', values.yellow, 'color: #ffff00'],
+        ['Laranja', values.orange, 'color: #ff4500']
+      ]);
+
+      chartOptions = {
+        title: 'Fitness por Cor',
+        legend: { position: 'none' },
+        bar: { groupWidth: '60%' },
+        vAxis: { minValue: 0 }
+      };
+
+      if(!chart) chart = new google.visualization.ColumnChart(document.getElementById('chart-div'));
+      chart.draw(chartData, chartOptions);
     }
 
     function spawnEmojis(boxId, emoji) {
@@ -232,45 +248,30 @@
       for(let i=0;i<count;i++){
         const el = document.createElement("div");
         el.className="emoji"; el.textContent=emoji;
-        const x = rect.left + Math.random()*rect.width;
-        const y = rect.top + window.scrollY;
-        el.style.left = x+"px"; el.style.top = y+"px";
+        el.style.left = rect.left + Math.random()*rect.width + "px";
+        el.style.top = rect.top + window.scrollY + "px";
         el.style.animationDuration = (1.5 + Math.random()) + "s";
         document.body.appendChild(el);
         setTimeout(()=>el.remove(),2000);
       }
     }
 
-    // Função que força o reload do gráfico adicionando timestamp
-    function refreshGraphs() {
-      const graphs = document.querySelectorAll('iframe.desktop-graph, iframe.mobile-graph');
-      graphs.forEach(iframe => {
-        iframe.src = iframe.src; // força reload sem alterar o link
-      });
-    }
-  
-    window.onload = () => {
+    google.charts.setOnLoadCallback(() => {
       updateCountsAndFitness();
-      setInterval(updateCountsAndFitness, 10000); // dados atualizam
-      setInterval(refreshGraphs, 10000); // gráficos atualizam a cada 10s
-  
+      setInterval(updateCountsAndFitness, 10000);
+
       const emojis = { blue:"💙", green:"💚", yellow:"💛", orange:"🧡" };
       Object.keys(emojis).forEach(color=>{
         document.getElementById(color+"-box")
           .addEventListener("click",()=>spawnEmojis(color+"-box",emojis[color]));
       });
-    };
-
+    });
   </script>
 </head>
 <body>
   <div class="main-container">
     <div class="frame">
-      <!-- Gráfico desktop / landscape -->
-      <iframe class="desktop-graph" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRz9hVP7G-Tm2Ie3z0-Kj1HXg1qSGTJINEWmqVFiL9_BknGwLI0KRITqyA3NWJkzp8jFUXqiYRIK3uj/pubchart?oid=880450610&format=interactive" allowfullscreen></iframe>
-
-      <!-- Gráfico mobile portrait -->
-      <iframe class="mobile-graph" src="https://docs.google.com/spreadsheets/d/e/2PACX-1vRz9hVP7G-Tm2Ie3z0-Kj1HXg1qSGTJINEWmqVFiL9_BknGwLI0KRITqyA3NWJkzp8jFUXqiYRIK3uj/pubchart?oid=747883766&format=interactive" allowfullscreen></iframe>
+      <div id="chart-div"></div>
 
       <div class="last-event-box">
         <div class="live-dot"></div>
