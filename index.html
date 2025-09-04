@@ -69,13 +69,32 @@ h2 { margin:0; text-align:center; font-size:1.5rem; }
 
 /* MOBILE PORTRAIT */
 @media (max-width:1000px) and (orientation:portrait) {
-    .main-container { flex-direction:column; align-items:center; margin:0; height:100vh; }
-    .frame { width:95%; height:calc(20vh - 200px); margin-bottom:1rem; display:flex; flex-direction:column; }
-    #chart_div { height: calc(100% - 80px); }
-    .counts-section { width:95%; margin-top:auto; } /* botões no fundo */
+    .main-container { 
+        flex-direction:column; 
+        align-items:center; 
+        margin:0; 
+        height:100vh; 
+        padding:0.5rem;
+        overflow-x:auto; /* permite scroll se necessário */
+    }
+    .frame { 
+        width:95%; 
+        height: 50vh;      /* metade da tela */
+        max-height: 60vh;  /* não passa disto */
+        min-height: 200px; /* sempre visível */
+        margin-bottom:1rem; 
+        display:flex; 
+        flex-direction:column; 
+        box-sizing:border-box;
+    }
+    #chart_div { 
+        height: calc(100% - 50px); /* deixa espaço para last-event-box */
+    }
+    .counts-section { width:95%; margin-top:auto; } 
     .counts-boxes { flex-direction:row; justify-content:space-around; flex-wrap:wrap; }
     .count-box { flex:1 1 45%; min-height:60px; margin-bottom:0.5rem; }
 }
+
 </style>
 <script>
 google.charts.load('current', {packages:['corechart']});
@@ -152,7 +171,7 @@ function drawChart(data){
         hAxis:{
             textPosition:'out',
             viewWindow: { min: 0, max: data.getNumberOfRows()-1 }, // <--- bloqueia crescimento horizontal
-            format: 0
+            format: '0.#'
         },
         colors:['#007BFF','#28a745','#ffff00','#ff4500'],
         legend:{position:'top'},
