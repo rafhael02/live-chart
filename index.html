@@ -5,10 +5,18 @@
 <title>Roda da Evolução</title>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <style>
-  html, body { margin:0; padding:0; height:100%; width:100%; background: radial-gradient(circle at top left, green 0%, transparent 60%), radial-gradient(circle at bottom right, blue 0%, transparent 60%), radial-gradient(circle at top right, orange 0%, transparent 90%), radial-gradient(circle at bottom left, yellow 0%, transparent 60%); font-family: Arial,sans-serif; display:flex; justify-content:center; align-items:center;}
+  html, body { 
+    margin:0; padding:0; height:100%; width:100%; 
+    background: radial-gradient(circle at top left, green 0%, transparent 60%),
+                radial-gradient(circle at bottom right, blue 0%, transparent 60%),
+                radial-gradient(circle at top right, orange 0%, transparent 90%),
+                radial-gradient(circle at bottom left, yellow 0%, transparent 60%);
+    font-family: Arial,sans-serif; 
+    display:flex; justify-content:center; align-items:center;
+  }
   .main-container { display:flex; gap:2rem; align-items:stretch; margin:2rem; max-width:1200px; width:100%; }
   .frame { flex:2; background:white; padding:1rem; border-radius:12px; box-shadow:0 0 30px rgba(0,0,0,0.2); display:flex; flex-direction:column; align-items:center;}
-  #chart_div { width:100%; height:400px; }
+  #chart_div { width:100%; height:600px; } /* gráfico maior */
   .last-event-box { display:flex; align-items:center; margin-top:0.5rem; padding:0.5rem 1rem; background:#fff3f3; border-radius:8px; font-weight:bold; font-size:1rem; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
   .live-dot { height:12px; width:12px; background:red; border-radius:50%; display:inline-block; margin-right:8px; animation:blink 1s infinite; }
   @keyframes blink { 50% { opacity:0; } }
@@ -64,40 +72,54 @@ async function updateData() {
 
     // População histórica
     const popHist = await fetchPopulationHistory("E4:H207");
-    const chartData = [['Geração','Azul','Verde','Amarelo','Laranja']];
+
+    // Criar tabela com tooltips personalizados
+    const data = new google.visualization.DataTable();
+    data.addColumn('number', 'Geração');
+    data.addColumn('number', 'Azul');
+    data.addColumn({type: 'string', role: 'tooltip', p:{html:true}});
+    data.addColumn('number', 'Verde');
+    data.addColumn({type: 'string', role: 'tooltip', p:{html:true}});
+    data.addColumn('number', 'Amarelo');
+    data.addColumn({type: 'string', role: 'tooltip', p:{html:true}});
+    data.addColumn('number', 'Laranja');
+    data.addColumn({type: 'string', role: 'tooltip', p:{html:true}});
+
     popHist.forEach((row,i)=>{
         const total = row.reduce((a,b)=>a+b,0) || 1;
-        chartData.push([
-            i+1, 
-            (row[0]/total)*100, 
-            (row[1]/total)*100, 
-            (row[2]/total)*100, 
-            (row[3]/total)*100
+        const [blue,green,yellow,orange] = row;
+        const bluePct   = ((blue/total)*100).toFixed(1);
+        const greenPct  = ((green/total)*100).toFixed(1);
+        const yellowPct = ((yellow/total)*100).toFixed(1);
+        const orangePct = ((orange/total)*100).toFixed(1);
+
+        data.addRow([
+            i+1,
+            (blue/total)*100,   `Azul: ${blue} bolas<br>${bluePct}%`,
+            (green/total)*100,  `Verde: ${green} bolas<br>${greenPct}%`,
+            (yellow/total)*100, `Amarelo: ${yellow} bolas<br>${yellowPct}%`,
+            (orange/total)*100, `Laranja: ${orange} bolas<br>${orangePct}%`
         ]);
     });
 
-    drawChart(chartData);
+    drawChart(data);
 
-    // População atual e fitness
+    // População atual
     const [bluePop,greenPop,yellowPop,orangePop] = await Promise.all([
-        fetchCell("O2"), fetchCell("P2"), fetchCell("Q2"), fetchCell("R2")
+        fetchCell("O2","blue-count"), 
+        fetchCell("P2","green-count"), 
+        fetchCell("Q2","yellow-count"), 
+        fetchCell("R2","orange-count")
     ]);
+    // Fitness atual
     const [blueFit,greenFit,yellowFit,orangeFit] = await Promise.all([
         fetchCell("O5"), fetchCell("P5"), fetchCell("Q5"), fetchCell("R5")
     ]);
 
-    // Atualiza contadores
-    document.getElementById("blue-count").textContent = bluePop;
-    document.getElementById("green-count").textContent = greenPop;
-    document.getElementById("yellow-count").textContent = yellowPop;
-    document.getElementById("orange-count").textContent = orangePop;
-
-    // Atualiza fitness
     updateFitnessBars(blueFit,greenFit,yellowFit,orangeFit);
 }
 
-function drawChart(dataArray){
-    const data = google.visualization.arrayToDataTable(dataArray);
+function drawChart(data){
     const options = {
         title:'Distribuição por Geração (%)',
         isStacked:true,
@@ -106,7 +128,8 @@ function drawChart(dataArray){
         colors:['#007BFF','#28a745','#ffff00','#ff4500'],
         legend:{position:'top'},
         animation:{duration:500,easing:'out'},
-        areaOpacity:0.7
+        areaOpacity:0.7,
+        tooltip: {isHtml:true}   // ativa tooltips personalizados
     };
     const chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
     chart.draw(data, options);
