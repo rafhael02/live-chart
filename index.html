@@ -2,7 +2,7 @@
 <html lang="pt">
 <head>
   <meta charset="UTF-8">
-  <title>Roda da Evolução*</title>
+  <title>Roda da Evolução</title>
   <style>
     html, body {
       margin: 0;
@@ -110,7 +110,7 @@
     .blue { background: #007BFF; }
     .green { background: #28a745; }
     .yellow { background: #ffff00; color: black; }
-    .orange { background: #ffa500; }
+    .orange { background: #ff4500; }
 
     .fitness-bar-container {
       width: 100%;
@@ -154,11 +154,23 @@
 
     /* Modo mobile portrait */
     @media (max-width: 1000px) and (orientation: portrait) {
-      .main-container { flex-direction: column; align-items: center; }
-      .desktop-graph { display: none; }
-      .mobile-graph { display: block; width: 100%; height: 600px; }
-      .counts-section { width: 100%; margin-top: 1rem; }
-      .counts-boxes { flex: unset; }
+      .main-container {
+        flex-direction: column;
+        align-items: center;
+      }
+    
+      .frame {
+        width: 100%;      /* largura igual aos botões */
+        height: 90vh;     /* altura maior e responsiva */
+        padding: 1rem;
+      }
+    
+      iframe {
+        width: 100%;      /* ocupa toda a largura do frame */
+        height: 100%;     /* ocupa toda a altura do frame */
+        transform: none;  /* remove zoom para não ficar desfocado */
+        transform-origin: top left;
+      }
     }
 
     /* Modo mobile landscape */
