@@ -43,7 +43,6 @@ html, body {
     width:100%;
     height: calc(100% - 50px); /* deixa espaço para last-event-box */
     margin-bottom:0.5rem;
-    overflow-x:auto;
 }
 
 .last-event-box {
@@ -150,7 +149,10 @@ function drawChart(data){
         title:'Distribuição por Geração (%)',
         isStacked:true,
         vAxis:{minValue:0,maxValue:100, textPosition:'out'}, 
-        hAxis:{textPosition:'out'},
+        hAxis:{
+            textPosition:'out',
+            viewWindow: { min: 0, max: data.getNumberOfRows()-1 } // <--- bloqueia crescimento horizontal
+        },
         colors:['#007BFF','#28a745','#ffff00','#ff4500'],
         legend:{position:'top'},
         animation: firstDraw ? {duration:500,easing:'out'} : null,
