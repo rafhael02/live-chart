@@ -137,58 +137,65 @@
   </style>
   <script>
     google.charts.load('current', {packages:['corechart']});
+    const MAX_GENERATIONS = 200;
+    let chartData, chart;
 
-    async function fetchCell(url, elementId, prefix = "") {
+    async function fetchCell(url, elementId=null, prefix="") {
       try {
         const response = await fetch(url);
         let text = await response.text();
         text = text.trim();
-        if (text.startsWith('"') && text.endsWith('"')) text = text.slice(1, -1);
-        if (elementId) document.getElementById(elementId).textContent = prefix + text;
+        if(text.startsWith('"') && text.endsWith('"')) text = text.slice(1,-1);
+        if(elementId) document.getElementById(elementId).textContent = prefix + text;
         return parseFloat(text) || 0;
-      } catch (e) { console.error("Erro ao buscar célula:", e); return 0; }
+      } catch(e){ console.error(e); return 0; }
     }
 
-    async function updateData() {
-      const urls = {
-        geracao: ["N2","geracao-atual","Geração Atual: "],
-        blue: "O2", green: "P2", yellow: "Q2", orange: "R2",
-        last: ["S2","last-event","Último Evento: "]
-      };
-
-      const geracao = await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.geracao[0]}`, urls.geracao[1], urls.geracao[2]);
-      const blue = await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.blue}`, null);
-      const green = await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.green}`, null);
-      const yellow = await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.yellow}`, null);
-      const orange = await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.orange}`, null);
-      await fetchCell(`https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=${urls.last[0]}`, urls.last[1], urls.last[2]);
-
-      drawChart(blue, green, yellow, orange);
-      updateFitnessBars(blue, green, yellow, orange); // opcional, se tiveres fitness separados
-    }
-
-    function drawChart(blue, green, yellow, orange) {
-      const data = google.visualization.arrayToDataTable([
-        ['Cor', 'Quantidade', { role: 'style' }],
-        ['Azul', blue, 'color: #007BFF'],
-        ['Verde', green, 'color: #28a745'],
-        ['Amarelo', yellow, 'color: #ffff00'],
-        ['Laranja', orange, 'color: #ff4500']
-      ]);
+    function initChart() {
+      const dataArray = [['Geração','Azul','Verde','Amarelo','Laranja']];
+      for(let i=0;i<=MAX_GENERATIONS;i++){
+        dataArray.push([i,25,25,25,25]);
+      }
+      chartData = google.visualization.arrayToDataTable(dataArray);
 
       const options = {
-        title: 'Distribuição por Geração',
-        vAxis: { minValue: 0, maxValue: 200 },
-        legend: 'none',
-        bar: { groupWidth: '60%' },
+        title: 'Proporção de Cores por Geração',
+        isStacked: true,
+        vAxis: { minValue: 0, maxValue: 100, format:'#\'%\'' },
+        hAxis: { title:'Geração' },
+        legend: { position: 'top' },
+        colors: ['#007BFF','#28a745','#ffff00','#ff4500'],
+        areaOpacity: 0.8,
         animation: { duration: 500, easing: 'out' }
       };
 
-      const chart = new google.visualization.ColumnChart(document.getElementById('chart_div'));
-      chart.draw(data, options);
+      chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
+      chart.draw(chartData, options);
     }
 
-    function spawnEmojis(boxId, emoji) {
+    async function fetchGenerationData() {
+      const baseURL = "https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=";
+      const ranges = { blue:"O2:O201", green:"P2:P201", yellow:"Q2:Q201", orange:"R2:R201" };
+      const results = {};
+
+      for(const color in ranges){
+        const res = await fetch(baseURL + ranges[color]);
+        let text = await res.text();
+        text = text.split('\n').map(line => parseFloat(line.replace(/"/g,'')) || 0);
+        results[color] = text;
+      }
+
+      for(let i=0;i<=MAX_GENERATIONS;i++){
+        chartData.setValue(i,1,results.blue[i]||0);
+        chartData.setValue(i,2,results.green[i]||0);
+        chartData.setValue(i,3,results.yellow[i]||0);
+        chartData.setValue(i,4,results.orange[i]||0);
+      }
+
+      chart.draw(chartData);
+    }
+
+    function spawnEmojis(boxId, emoji){
       const count = Math.floor(Math.random()*3)+3;
       const box = document.getElementById(boxId);
       const rect = box.getBoundingClientRect();
@@ -204,31 +211,34 @@
       }
     }
 
-    function updateFitnessBars(blue, green, yellow, orange) {
-      const fitness = {blue, green, yellow, orange};
-      const max = Math.max(...Object.values(fitness), 1);
-      for(const color in fitness) {
+    function updateFitnessBars(blue, green, yellow, orange){
+      const fitness = {blue,green,yellow,orange};
+      const max = Math.max(...Object.values(fitness),1);
+      for(const color in fitness){
         const proportion = (fitness[color]/max)*100;
         const bar = document.getElementById(color+'-fitness');
         if(bar){
           bar.style.width = proportion+'%';
           const greenRatio = fitness[color]/max;
-          const red = Math.floor(255*(1-greenRatio));
+          const r = Math.floor(255*(1-greenRatio));
           const g = Math.floor(200*greenRatio+55);
-          bar.style.backgroundColor = `rgb(${red},${g},0)`;
+          bar.style.backgroundColor = `rgb(${r},${g},0)`;
           bar.textContent = `⚡${Math.round(fitness[color])}`;
         }
       }
     }
 
-    window.onload = () => {
-      google.charts.setOnLoadCallback(updateData);
-      setInterval(updateData, 10000);
+    window.onload = ()=>{
+      google.charts.setOnLoadCallback(()=>{
+        initChart();
+        fetchGenerationData();
+        setInterval(fetchGenerationData,10000);
+      });
 
       const emojis = { blue:"💙", green:"💚", yellow:"💛", orange:"🧡" };
       Object.keys(emojis).forEach(color=>{
-        document.getElementById(color+"-box")
-          .addEventListener("click",()=>spawnEmojis(color+"-box",emojis[color]));
+        document.getElementById(color+'-box')
+          .addEventListener('click',()=>spawnEmojis(color+'-box',emojis[color]));
       });
     };
   </script>
