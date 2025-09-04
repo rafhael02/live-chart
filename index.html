@@ -19,18 +19,19 @@
   .frame {
     flex:2;
     background:white;
-    padding:0.5rem;   /* menos espaço para o gráfico ganhar área */
+    padding:1rem;
     border-radius:12px;
     box-shadow:0 0 30px rgba(0,0,0,0.2);
     display:flex;
     flex-direction:column;
     align-items:stretch;
+    height:auto;           /* mantém o tamanho original do frame */
   }
   
   #chart_div {
-    flex-grow:1;        /* ocupa todo o espaço disponível */
+    flex-grow:1;           /* ocupa todo o espaço disponível dentro do frame */
     width:100%;
-    min-height:500px;   /* aumenta a altura mínima */
+    min-height:350px;      /* aumenta a altura do gráfico dentro do frame */
     margin-bottom:0.5rem;
   }
 
@@ -131,7 +132,7 @@ function drawChart(data){
     const options = {
         title:'Distribuição por Geração (%)',
         isStacked:true,
-        vAxis:{minValue:0,maxValue:100}, /* mantém valores, sem título extra */
+        vAxis:{minValue:0,maxValue:100}, 
         hAxis:{}, 
         colors:['#007BFF','#28a745','#ffff00','#ff4500'],
         legend:{position:'top'},
