@@ -19,19 +19,19 @@
   .frame {
     flex:2;
     background:white;
-    padding:1rem;
+    padding:0.5rem;   /* menos espaço para o gráfico ganhar área */
     border-radius:12px;
     box-shadow:0 0 30px rgba(0,0,0,0.2);
     display:flex;
     flex-direction:column;
-    align-items:stretch;   /* <- estica conteúdo */
+    align-items:stretch;
   }
   
   #chart_div {
-    flex:1;               /* <- ocupa todo o espaço disponível */
+    flex-grow:1;        /* ocupa todo o espaço disponível */
     width:100%;
-    height:100%;          /* <- altura relativa ao frame */
-    margin-bottom: 0.5rem; /* espaço entre gráfico e caixa */
+    min-height:500px;   /* aumenta a altura mínima */
+    margin-bottom:0.5rem;
   }
 
   .last-event-box { display:flex; align-items:center; margin-top:0.5rem; padding:0.5rem 1rem; background:#fff3f3; border-radius:8px; font-weight:bold; font-size:1rem; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
@@ -50,10 +50,8 @@
 <script>
 google.charts.load('current', {packages:['corechart']});
 
-// Base URL do CSV público do Google Sheets
 const baseURL = "https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=";
 
-// Função genérica para buscar uma célula
 async function fetchCell(range, elementId=null, prefix="") {
     try {
         const res = await fetch(baseURL+range);
@@ -65,7 +63,6 @@ async function fetchCell(range, elementId=null, prefix="") {
     } catch(e){ console.error("Erro fetchCell:",e); return 0;}
 }
 
-// Buscar intervalo de população histórica
 async function fetchPopulationHistory(range) {
     try {
         const res = await fetch(baseURL+range);
@@ -76,21 +73,16 @@ async function fetchPopulationHistory(range) {
                 return isNaN(n)?0:n;
             });
         });
-        return rows; // array de [Azul, Verde, Amarelo, Laranja] por geração
+        return rows;
     } catch(e){ console.error("Erro fetchPopulationHistory:",e); return []; }
 }
 
-// Atualizar gráfico e barras
 async function updateData() {
-    // Geração atual
     const currentGen = await fetchCell("N2","geracao-atual","Geração Atual: ");
-    // Último evento
     await fetchCell("S2","last-event","Último Evento: ");
 
-    // População histórica
     const popHist = await fetchPopulationHistory("E4:H207");
 
-    // Criar tabela com tooltips personalizados
     const data = new google.visualization.DataTable();
     data.addColumn('number', 'Geração');
     data.addColumn('number', 'Azul');
@@ -121,14 +113,13 @@ async function updateData() {
 
     drawChart(data);
 
-    // População atual
     await Promise.all([
         fetchCell("O2","blue-count"), 
         fetchCell("P2","green-count"), 
         fetchCell("Q2","yellow-count"), 
         fetchCell("R2","orange-count")
     ]);
-    // Fitness atual
+
     const [blueFit,greenFit,yellowFit,orangeFit] = await Promise.all([
         fetchCell("O5"), fetchCell("P5"), fetchCell("Q5"), fetchCell("R5")
     ]);
@@ -140,13 +131,13 @@ function drawChart(data){
     const options = {
         title:'Distribuição por Geração (%)',
         isStacked:true,
-        vAxis:{minValue:0,maxValue:100, textPosition:'none'},
-        hAxis:{textPosition:'none'},
+        vAxis:{minValue:0,maxValue:100}, /* mantém valores, sem título extra */
+        hAxis:{}, 
         colors:['#007BFF','#28a745','#ffff00','#ff4500'],
         legend:{position:'top'},
         animation:{duration:500,easing:'out'},
         areaOpacity:0.7,
-        tooltip: {isHtml:true}   // ativa tooltips personalizados
+        tooltip: {isHtml:true}
     };
     const chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
     chart.draw(data, options);
