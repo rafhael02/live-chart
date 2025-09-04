@@ -2,228 +2,200 @@
 <html lang="pt">
 <head>
 <meta charset="UTF-8">
-<title>Roda da Evolução</title>
+<title>Roda da Evolução*</title>
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <style>
 html, body { 
-    margin:0; padding:0; height:100%; width:100%; 
-    background: radial-gradient(circle at top left, green 0%, transparent 60%),
-                radial-gradient(circle at bottom right, blue 0%, transparent 60%),
-                radial-gradient(circle at top right, orange 0%, transparent 90%),
-                radial-gradient(circle at bottom left, yellow 0%, transparent 60%);
-    font-family: Arial,sans-serif; 
-    display:flex; justify-content:center; align-items:center;
+  margin:0; padding:0; height:100%; width:100%; 
+  background: radial-gradient(circle at top left, green 0%, transparent 60%),
+              radial-gradient(circle at bottom right, blue 0%, transparent 60%),
+              radial-gradient(circle at top right, orange 0%, transparent 90%),
+              radial-gradient(circle at bottom left, yellow 0%, transparent 60%);
+  font-family: Arial, sans-serif; 
+  display:flex; justify-content:center; align-items:center;
 }
-.main-container { 
-    display:flex; gap:2rem; align-items:stretch; margin:2rem; max-width:1200px; width:100%; 
-    flex-wrap: wrap;
-}
-
+.main-container { display:flex; gap:2rem; align-items:stretch; margin:2rem; max-width:1200px; width:100%; flex-wrap:wrap; }
 .frame {
-    flex:2;
-    background:white;
-    padding:1rem;
-    border-radius:12px;
-    box-shadow:0 0 30px rgba(0,0,0,0.2);
-    display:flex;
-    flex-direction:column;
-    align-items:stretch;
-    height:500px;
+  flex:2; background:white; padding:1rem; border-radius:12px; box-shadow:0 0 30px rgba(0,0,0,0.2);
+  display:flex; flex-direction:column; align-items:stretch; height:500px;
 }
-
-#chart_div {
-    width:100%;
-    height:100%; 
-    margin-bottom:0.5rem;
-}
-
-.last-event-box { display:flex; align-items:center; margin-top:0.5rem; padding:0.5rem 1rem; background:#fff3f3; border-radius:8px; font-weight:bold; font-size:1rem; box-shadow:0 2px 6px rgba(0,0,0,0.2); }
+#chart_div { width:100%; height:100%; margin-bottom:0.5rem; }
+.last-event-box { display:flex; align-items:center; margin-top:0.5rem; padding:0.5rem 1rem; background:#fff3f3; border-radius:8px; font-weight:bold; font-size:1rem; box-shadow:0 2px 6px rgba(0,0,0,0.2);}
 .live-dot { height:12px; width:12px; background:red; border-radius:50%; display:inline-block; margin-right:8px; animation:blink 1s infinite; }
-@keyframes blink { 50% { opacity:0; } }
-
+@keyframes blink {50% {opacity:0;}}
 .counts-section { flex:1; display:flex; flex-direction:column; gap:1rem; }
 h2 { margin:0; text-align:center; font-size:1.5rem; }
 .counts-boxes { flex:1; display:flex; flex-direction:column; gap:1rem; justify-content:space-between; }
-
 .count-box { flex:1; min-height:80px; padding:1rem; border-radius:12px; color:white; font-size:1.2rem; text-align:center; font-weight:bold; box-shadow:0 4px 10px rgba(0,0,0,0.2); display:flex; flex-direction:column; justify-content:center; position:relative; cursor:pointer; }
 .blue { background:#007BFF; } .green { background:#28a745; } .yellow { background:#ffff00; color:black; } .orange { background:#ff4500; }
 .fitness-bar-container { width:100%; height:16px; background:rgba(0,0,0,0.1); border-radius:8px; margin-top:5px; overflow:hidden; position:relative; }
 .fitness-bar { height:100%; width:0%; border-radius:8px; transition:width 0.5s ease, background-color 0.5s ease; display:flex; align-items:center; justify-content:flex-end; padding-bottom:1px; padding-right:9px; color:white; font-weight:bold; font-size:0.85rem; box-sizing:border-box; }
 .emoji { position:absolute; font-size:1.5rem; animation:floatUp 2s ease-out forwards; pointer-events:none; }
-@keyframes floatUp { 0% { opacity:1; transform:translateY(0) scale(1);} 50% { opacity:0.8; transform:translateY(-40px) scale(1.2);} 100% { opacity:0; transform:translateY(-120px) scale(0.8);} }
+@keyframes floatUp { 0% {opacity:1; transform:translateY(0) scale(1);} 50% {opacity:0.8; transform:translateY(-40px) scale(1.2);} 100% {opacity:0; transform:translateY(-120px) scale(0.8);} }
 
-/* Responsivo */
-@media screen and (max-width:1000px){
-    .main-container { flex-direction:column; }
-    .frame { height:600px; }
-    .counts-section { flex-direction:row; justify-content:center; gap:1rem; }
-    .counts-boxes { flex-direction:row; flex:unset; gap:0.5rem; }
+/* Portrait mobile */
+@media (max-width:1000px) and (orientation:portrait){
+  .main-container{flex-direction:column; align-items:center;}
+  .frame{width:100%; height:600px;}
+  .counts-section{width:100%; margin-top:1rem;}
+  .counts-boxes{flex-direction:row; flex:unset; gap:0.5rem; justify-content:center;}
+  .count-box{flex:1 1 45%; min-height:70px;}
+  .fitness-bar-container{height:12px;}
+  .fitness-bar{font-size:0.75rem; padding-right:6px;}
 }
 </style>
 <script>
-google.charts.load('current', {packages:['corechart']});
-const baseURL = "https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=";
+google.charts.load('current',{packages:['corechart']});
+const baseURL="https://docs.google.com/spreadsheets/d/1Vv0tgSN05-hyKR837BkPM4QsebGyXOZolt58elGto18/gviz/tq?tqx=out:csv&range=";
 
-async function fetchCell(range, elementId=null, prefix="") {
-    try {
-        const res = await fetch(baseURL+range);
-        let text = await res.text();
-        text = text.trim();
-        if(text.startsWith('"') && text.endsWith('"')) text = text.slice(1,-1);
-        if(elementId) document.getElementById(elementId).textContent = prefix+text;
-        return parseFloat(text.replace(",", "."))||0;
-    } catch(e){ console.error("Erro fetchCell:",e); return 0;}
+async function fetchCell(range, elementId=null, prefix=""){
+  try{
+    const res = await fetch(baseURL+range);
+    let text = await res.text(); text=text.trim();
+    if(text.startsWith('"') && text.endsWith('"')) text=text.slice(1,-1);
+    if(elementId) document.getElementById(elementId).textContent = prefix+text;
+    return parseFloat(text.replace(",", "."))||0;
+  }catch(e){console.error("Erro fetchCell:",e); return 0;}
 }
 
-async function fetchPopulationHistory(range) {
-    try {
-        const res = await fetch(baseURL+range);
-        const text = await res.text();
-        const rows = text.trim().split("\n").map(line => {
-            return line.split(",").map(v => {
-                let n = parseFloat(v.replace(/"/g,'').replace(",", "."));
-                return isNaN(n)?0:n;
-            });
-        });
-        return rows;
-    } catch(e){ console.error("Erro fetchPopulationHistory:",e); return []; }
+async function fetchPopulationHistory(range){
+  try{
+    const res = await fetch(baseURL+range);
+    const text = await res.text();
+    return text.trim().split("\n").map(line=>line.split(",").map(v=>{ let n=parseFloat(v.replace(/"/g,'').replace(",", ".")); return isNaN(n)?0:n; }));
+  }catch(e){console.error("Erro fetchPopulationHistory:",e); return [];}
 }
 
-async function updateData() {
-    const currentGen = await fetchCell("N2","geracao-atual","Geração Atual: ");
-    await fetchCell("S2","last-event","Último Evento: ");
+async function updateData(){
+  const currentGen = await fetchCell("N2","geracao-atual","Geração Atual: ");
+  await fetchCell("S2","last-event","Último Evento: ");
 
-    const popHist = await fetchPopulationHistory("E4:H207");
+  const popHist = await fetchPopulationHistory("E4:H207");
+  const data = new google.visualization.DataTable();
+  data.addColumn('number','Geração');
+  data.addColumn('number','Azul'); data.addColumn({type:'string', role:'tooltip', p:{html:true}});
+  data.addColumn('number','Verde'); data.addColumn({type:'string', role:'tooltip', p:{html:true}});
+  data.addColumn('number','Amarelo'); data.addColumn({type:'string', role:'tooltip', p:{html:true}});
+  data.addColumn('number','Laranja'); data.addColumn({type:'string', role:'tooltip', p:{html:true}});
 
-    const data = new google.visualization.DataTable();
-    data.addColumn('number', 'Geração');
-    data.addColumn('number', 'Azul'); data.addColumn({type:'string', role:'tooltip', p:{html:true}});
-    data.addColumn('number', 'Verde'); data.addColumn({type:'string', role:'tooltip', p:{html:true}});
-    data.addColumn('number', 'Amarelo'); data.addColumn({type:'string', role:'tooltip', p:{html:true}});
-    data.addColumn('number', 'Laranja'); data.addColumn({type:'string', role:'tooltip', p:{html:true}});
-
-    popHist.forEach((row,i)=>{
-        const total = row.reduce((a,b)=>a+b,0) || 1;
-        const [blue,green,yellow,orange] = row;
-        const bluePct = ((blue/total)*100).toFixed(1);
-        const greenPct = ((green/total)*100).toFixed(1);
-        const yellowPct = ((yellow/total)*100).toFixed(1);
-        const orangePct = ((orange/total)*100).toFixed(1);
-        data.addRow([
-            i, // geração 0
-            (blue/total)*100, `<div style="color:gray">Geração ${i}</div><b>Azul: ${blue} (${bluePct}%)</b>`,
-            (green/total)*100, `<div style="color:gray">Geração ${i}</div><b>Verde: ${green} (${greenPct}%)</b>`,
-            (yellow/total)*100, `<div style="color:gray">Geração ${i}</div><b>Amarelo: ${yellow} (${yellowPct}%)</b>`,
-            (orange/total)*100, `<div style="color:gray">Geração ${i}</div><b>Laranja: ${orange} (${orangePct}%)</b>`
-        ]);
-    });
-
-    drawChart(data);
-
-    await Promise.all([
-        fetchCell("O2","blue-count"), 
-        fetchCell("P2","green-count"), 
-        fetchCell("Q2","yellow-count"), 
-        fetchCell("R2","orange-count")
+  popHist.forEach((row,i)=>{
+    const total=row.reduce((a,b)=>a+b,0)||1;
+    const [blue,green,yellow,orange]=row;
+    const bluePct=((blue/total)*100).toFixed(1);
+    const greenPct=((green/total)*100).toFixed(1);
+    const yellowPct=((yellow/total)*100).toFixed(1);
+    const orangePct=((orange/total)*100).toFixed(1);
+    data.addRow([
+      i,
+      (blue/total)*100, `<div style="color:gray">Geração ${i}</div><b>Azul: ${blue} (${bluePct}%)</b>`,
+      (green/total)*100, `<div style="color:gray">Geração ${i}</div><b>Verde: ${green} (${greenPct}%)</b>`,
+      (yellow/total)*100, `<div style="color:gray">Geração ${i}</div><b>Amarelo: ${yellow} (${yellowPct}%)</b>`,
+      (orange/total)*100, `<div style="color:gray">Geração ${i}</div><b>Laranja: ${orange} (${orangePct}%)</b>`
     ]);
+  });
 
-    const [blueFit,greenFit,yellowFit,orangeFit] = await Promise.all([
-        fetchCell("O5"), fetchCell("P5"), fetchCell("Q5"), fetchCell("R5")
-    ]);
-    updateFitnessBars(blueFit,greenFit,yellowFit,orangeFit);
+  drawChart(data);
+
+  await Promise.all([
+    fetchCell("O2","blue-count"), 
+    fetchCell("P2","green-count"), 
+    fetchCell("Q2","yellow-count"), 
+    fetchCell("R2","orange-count")
+  ]);
+
+  const [blueFit,greenFit,yellowFit,orangeFit] = await Promise.all([
+    fetchCell("O5"), fetchCell("P5"), fetchCell("Q5"), fetchCell("R5")
+  ]);
+  updateFitnessBars(blueFit,greenFit,yellowFit,orangeFit);
 }
 
 function drawChart(data){
-    const options = {
-        title:'Distribuição por Geração (%)',
-        isStacked:true,
-        vAxis:{minValue:0,maxValue:100, textPosition:'out'},
-        hAxis:{textPosition:'out'},
-        colors:['#007BFF','#28a745','#ffff00','#ff4500'],
-        legend:{position:'top'},
-        animation:{duration:500,easing:'out'},
-        areaOpacity:0.7,
-        tooltip: {isHtml:true},
-        chartArea: {left:50,top:50,right:30,bottom:50,width:'90%',height:'85%'}
-    };
-    const chart = new google.visualization.AreaChart(document.getElementById('chart_div'));
-    chart.draw(data, options);
+  const options={
+    title:'Distribuição por Geração (%)',
+    isStacked:true,
+    vAxis:{minValue:0,maxValue:100,textPosition:'out'},
+    hAxis:{textPosition:'out'},
+    colors:['#007BFF','#28a745','#ffff00','#ff4500'],
+    legend:{position:'top'},
+    animation:{duration:500,easing:'out'},
+    areaOpacity:0.7,
+    tooltip:{isHtml:true},
+    chartArea:{left:50,top:50,right:30,bottom:50,width:'100%',height:'100%'}
+  };
+  const chart=new google.visualization.AreaChart(document.getElementById('chart_div'));
+  chart.draw(data,options);
 }
 
-function spawnEmojis(boxId, emoji){
-    const count = Math.floor(Math.random()*3)+3;
-    const box = document.getElementById(boxId);
-    const rect = box.getBoundingClientRect();
-    for(let i=0;i<count;i++){
-        const el=document.createElement("div");
-        el.className="emoji"; el.textContent=emoji;
-        el.style.left = rect.left + Math.random()*rect.width + "px";
-        el.style.top = rect.top + window.scrollY + "px";
-        el.style.animationDuration = (1.5+Math.random())+"s";
-        document.body.appendChild(el);
-        setTimeout(()=>el.remove(),2000);
-    }
+function spawnEmojis(boxId,emoji){
+  const count=Math.floor(Math.random()*3)+3;
+  const box=document.getElementById(boxId);
+  const rect=box.getBoundingClientRect();
+  for(let i=0;i<count;i++){
+    const el=document.createElement("div");
+    el.className="emoji"; el.textContent=emoji;
+    el.style.left=rect.left+Math.random()*rect.width+"px";
+    el.style.top=rect.top+window.scrollY+"px";
+    el.style.animationDuration=(1.5+Math.random())+"s";
+    document.body.appendChild(el);
+    setTimeout(()=>el.remove(),2000);
+  }
 }
 
 function updateFitnessBars(blue,green,yellow,orange){
-    const fitness = {blue,green,yellow,orange};
-    const max = Math.max(...Object.values(fitness),1);
-    for(const color in fitness){
-        const proportion = (fitness[color]/max)*100;
-        const bar = document.getElementById(color+'-fitness');
-        if(bar){
-            bar.style.width = proportion+'%';
-            const greenRatio = fitness[color]/max;
-            const r=Math.floor(255*(1-greenRatio));
-            const g=Math.floor(200*greenRatio+55);
-            bar.style.backgroundColor = `rgb(${r},${g},0)`;
-            bar.textContent = `⚡${Math.round(fitness[color])}`;
-        }
+  const fitness={blue,green,yellow,orange};
+  const max=Math.max(...Object.values(fitness),1);
+  for(const color in fitness){
+    const proportion=(fitness[color]/max)*100;
+    const bar=document.getElementById(color+'-fitness');
+    if(bar){
+      bar.style.width=proportion+'%';
+      const greenRatio=fitness[color]/max;
+      const r=Math.floor(255*(1-greenRatio));
+      const g=Math.floor(200*greenRatio+55);
+      bar.style.backgroundColor=`rgb(${r},${g},0)`;
+      bar.textContent=`⚡${Math.round(fitness[color])}`;
     }
+  }
 }
 
-window.onload = () => {
-    google.charts.setOnLoadCallback(updateData);
-    setInterval(updateData,10000);
+window.onload=()=>{
+  google.charts.setOnLoadCallback(updateData);
+  setInterval(updateData,10000);
 
-    const emojis = { blue:"💙", green:"💚", yellow:"💛", orange:"🧡" };
-    Object.keys(emojis).forEach(color=>{
-        document.getElementById(color+"-box").addEventListener("click",()=>spawnEmojis(color+"-box",emojis[color]));
-    });
+  const emojis={blue:"💙",green:"💚",yellow:"💛",orange:"🧡"};
+  Object.keys(emojis).forEach(color=>{
+    document.getElementById(color+"-box").addEventListener("click",()=>spawnEmojis(color+"-box",emojis[color]));
+  });
 };
 </script>
 </head>
 <body>
 <div class="main-container">
-    <div class="frame">
-        <div id="chart_div"></div>
-        <div class="last-event-box">
-            <div class="live-dot"></div>
-            <span id="last-event">Último Evento: --</span>
-        </div>
+  <div class="frame">
+    <div id="chart_div"></div>
+    <div class="last-event-box">
+      <div class="live-dot"></div>
+      <span id="last-event">Último Evento: --</span>
     </div>
+  </div>
 
-    <div class="counts-section">
-        <h2 id="geracao-atual">Geração Atual: --</h2>
-        <div class="counts-boxes">
-            <div class="count-box blue" id="blue-box">
-                Azul<br><span id="blue-count">--</span>
-                <div class="fitness-bar-container"><div class="fitness-bar" id="blue-fitness">⚡0</div></div>
-            </div>
-            <div class="count-box green" id="green-box">
-                Verde<br><span id="green-count">--</span>
-                <div class="fitness-bar-container"><div class="fitness-bar" id="green-fitness">⚡0</div></div>
-            </div>
-            <div class="count-box yellow" id="yellow-box">
-                Amarelo<br><span id="yellow-count">--</span>
-                <div class="fitness-bar-container"><div class="fitness-bar" id="yellow-fitness">⚡0</div></div>
-            </div>
-            <div class="count-box orange" id="orange-box">
-                Laranja<br><span id="orange-count">--</span>
-                <div class="fitness-bar-container"><div class="fitness-bar" id="orange-fitness">⚡0</div></div>
-            </div>
-        </div>
+  <div class="counts-section">
+    <h2 id="geracao-atual">Geração Atual: --</h2>
+    <div class="counts-boxes">
+      <div class="count-box blue" id="blue-box">Azul<br><span id="blue-count">--</span>
+        <div class="fitness-bar-container"><div class="fitness-bar" id="blue-fitness">⚡0</div></div>
+      </div>
+      <div class="count-box green" id="green-box">Verde<br><span id="green-count">--</span>
+        <div class="fitness-bar-container"><div class="fitness-bar" id="green-fitness">⚡0</div></div>
+      </div>
+      <div class="count-box yellow" id="yellow-box">Amarelo<br><span id="yellow-count">--</span>
+        <div class="fitness-bar-container"><div class="fitness-bar" id="yellow-fitness">⚡0</div></div>
+      </div>
+      <div class="count-box orange" id="orange-box">Laranja<br><span id="orange-count">--</span>
+        <div class="fitness-bar-container"><div class="fitness-bar" id="orange-fitness">⚡0</div></div>
+      </div>
     </div>
+  </div>
 </div>
 </body>
 </html>
