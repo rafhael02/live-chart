@@ -12,8 +12,10 @@ html, body {
               radial-gradient(circle at top right, orange 0%, transparent 90%),
               radial-gradient(circle at bottom left, yellow 0%, transparent 60%);
   font-family: Arial,sans-serif;
-  display:flex; justify-content:center; align-items:flex-start;
 }
+
+body { display:flex; justify-content:center; align-items:flex-start; }
+
 .main-container {
   display:flex;
   gap:2rem;
@@ -33,15 +35,14 @@ html, body {
   box-shadow:0 0 20px rgba(0,0,0,0.2);
   display:flex;
   flex-direction:column;
-  align-items:stretch;
   max-height:calc(100vh - 40px);
 }
 #chart_div {
   width:100%;
   height:400px;
   min-height:300px;
-  overflow:hidden; /* remove scroll horizontal */
-  flex:none; /* evita que cresça sozinho */
+  overflow:hidden;
+  flex:none;
 }
 .last-event-box {
   display:flex;
@@ -87,10 +88,11 @@ h2 { margin:0; text-align:center; font-size:1.5rem; }
 
 /* MOBILE PORTRAIT */
 @media (max-width:1000px) and (orientation:portrait) {
-  .main-container { flex-direction:column; height:100vh; }
-  .frame { width:100%; max-height:none; margin-bottom:0; }
-  #chart_div { min-height:300px; overflow-x:auto; }
-  .counts-section { width:100%; margin-top:auto; } /* push buttons to bottom */
+  html, body { height:100%; }
+  .main-container { flex-direction:column; height:100vh; margin:0; }
+  .frame { width:100%; max-height:none; flex:none; display:flex; flex-direction:column; margin-bottom:0; }
+  #chart_div { flex:1; min-height:300px; overflow-x:auto; }
+  .counts-section { width:100%; margin-top:auto; padding-bottom:1rem; } /* push buttons to bottom */
   .counts-boxes { flex-direction:row; justify-content:space-around; flex-wrap:wrap; }
   .count-box { flex:1 1 45%; min-height:60px; }
 }
