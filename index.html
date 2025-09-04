@@ -241,16 +241,27 @@
       }
     }
 
+    // Função que força o reload do gráfico adicionando timestamp
+    function refreshGraphs() {
+      const graphs = document.querySelectorAll('iframe.desktop-graph, iframe.mobile-graph');
+      graphs.forEach(iframe => {
+        const src = iframe.src.split('?')[0]; // limpa query anterior
+        iframe.src = src + '?t=' + new Date().getTime(); // adiciona timestamp
+      });
+    }
+  
     window.onload = () => {
       updateCountsAndFitness();
-      setInterval(updateCountsAndFitness, 10000);
-
+      setInterval(updateCountsAndFitness, 10000); // dados atualizam
+      setInterval(refreshGraphs, 10000); // gráficos atualizam a cada 10s
+  
       const emojis = { blue:"💙", green:"💚", yellow:"💛", orange:"🧡" };
       Object.keys(emojis).forEach(color=>{
         document.getElementById(color+"-box")
           .addEventListener("click",()=>spawnEmojis(color+"-box",emojis[color]));
       });
     };
+
   </script>
 </head>
 <body>
