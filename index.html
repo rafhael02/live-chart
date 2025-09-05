@@ -9,7 +9,7 @@ html, body {
     margin:0; padding:0; height:100%; width:100%; 
     background: radial-gradient(circle at top left, green 0%, transparent 60%),
                 radial-gradient(circle at bottom right, blue 0%, transparent 60%),
-                radial-gradient(circle at top right, orange 0%, transparent 90%),
+                radial-gradient(circle at top right, red 0%, transparent 90%),
                 radial-gradient(circle at bottom left, yellow 0%, transparent 60%);
     font-family: Arial,sans-serif; 
     display:flex; justify-content:center; align-items:center;
@@ -59,7 +59,7 @@ h2 { margin:0; text-align:center; font-size:1.5rem; }
 .counts-boxes { flex:1; display:flex; flex-direction:column; gap:1rem; justify-content:flex-start; }
 
 .count-box { flex:1; min-height:70px; padding:1rem; border-radius:12px; color:white; font-size:1.2rem; text-align:center; font-weight:bold; box-shadow:0 4px 10px rgba(0,0,0,0.2); display:flex; flex-direction:column; justify-content:center; position:relative; cursor:pointer; }
-.blue { background:#007BFF; } .green { background:#28a745; } .yellow { background:#ffff00; color:black; } .orange { background:#ff4500; }
+.blue { background:#007BFF; } .green { background:#28a745; } .yellow { background:#ffff00; color:black; } .red { background:#ff0000; }
 
 .fitness-bar-container { width:100%; height:16px; background:rgba(0,0,0,0.1); border-radius:8px; margin-top:5px; overflow:hidden; position:relative; }
 .fitness-bar { height:100%; width:0%; border-radius:8px; transition:width 0.5s ease, background-color 0.5s ease; display:flex; align-items:center; justify-content:flex-end; padding-bottom:1px; padding-right:9px; color:white; font-weight:bold; font-size:0.85rem; box-sizing:border-box; }
@@ -135,16 +135,16 @@ async function updateData() {
 
     popHist.forEach((row,i)=>{
         const total = row.reduce((a,b)=>a+b,0) || 1;
-        const [blue,green,yellow,orange] = row;
+        const [blue,green,yellow,red] = row;
         const bluePct   = ((blue/total)*100).toFixed(1);
         const greenPct  = ((green/total)*100).toFixed(1);
         const yellowPct = ((yellow/total)*100).toFixed(1);
-        const orangePct = ((orange/total)*100).toFixed(1);
+        const redPct = ((red/total)*100).toFixed(1);
         data.addRow([
             i, (blue/total)*100, `<div style="color:gray">Geração ${i}</div><b>Azul: ${blue} (${bluePct}%)</b>`,
             (green/total)*100, `<div style="color:gray">Geração ${i}</div><b>Verde: ${green} (${greenPct}%)</b>`,
             (yellow/total)*100, `<div style="color:gray">Geração ${i}</div><b>Amarelo: ${yellow} (${yellowPct}%)</b>`,
-            (orange/total)*100, `<div style="color:gray">Geração ${i}</div><b>Laranja: ${orange} (${orangePct}%)</b>`
+            (red/total)*100, `<div style="color:gray">Geração ${i}</div><b>Vermelho: ${red} (${redPct}%)</b>`
         ]);
     });
 
@@ -154,13 +154,13 @@ async function updateData() {
         fetchCell("O2","blue-count"), 
         fetchCell("P2","green-count"), 
         fetchCell("Q2","yellow-count"), 
-        fetchCell("R2","orange-count")
+        fetchCell("R2","red-count")
     ]);
 
-    const [blueFit,greenFit,yellowFit,orangeFit] = await Promise.all([
+    const [blueFit,greenFit,yellowFit,redFit] = await Promise.all([
         fetchCell("O5"), fetchCell("P5"), fetchCell("Q5"), fetchCell("R5")
     ]);
-    updateFitnessBars(blueFit,greenFit,yellowFit,orangeFit);
+    updateFitnessBars(blueFit,greenFit,yellowFit,redFit);
 }
 
 let firstDraw = true;
@@ -200,8 +200,8 @@ function spawnEmojis(boxId, emoji){
     }
 }
 
-function updateFitnessBars(blue,green,yellow,orange){
-    const fitness = {blue,green,yellow,orange};
+function updateFitnessBars(blue,green,yellow,red){
+    const fitness = {blue,green,yellow,red};
     const max = Math.max(...Object.values(fitness),1);
     for(const color in fitness){
         const proportion = (fitness[color]/max)*100;
@@ -221,7 +221,7 @@ window.onload = () => {
     google.charts.setOnLoadCallback(updateData);
     setInterval(updateData,10000);
 
-    const emojis = { blue:"💙", green:"💚", yellow:"💛", orange:"🧡" };
+    const emojis = { blue:"💙", green:"💚", yellow:"💛", red:"❤️" };
     Object.keys(emojis).forEach(color=>{
         document.getElementById(color+"-box").addEventListener("click",()=>spawnEmojis(color+"-box",emojis[color]));
     });
@@ -253,9 +253,9 @@ window.onload = () => {
                 Amarelo<br><span id="yellow-count">--</span>
                 <div class="fitness-bar-container"><div class="fitness-bar" id="yellow-fitness">⚡0</div></div>
             </div>
-            <div class="count-box orange" id="orange-box">
-                Laranja<br><span id="orange-count">--</span>
-                <div class="fitness-bar-container"><div class="fitness-bar" id="orange-fitness">⚡0</div></div>
+            <div class="count-box red" id="red-box">
+                Laranja<br><span id="red-count">--</span>
+                <div class="fitness-bar-container"><div class="fitness-bar" id="red-fitness">⚡0</div></div>
             </div>
         </div>
     </div>
