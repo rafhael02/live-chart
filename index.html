@@ -131,7 +131,7 @@ async function updateData() {
     data.addColumn('number', 'Azul'); data.addColumn({type: 'string', role: 'tooltip', p:{html:true}});
     data.addColumn('number', 'Verde'); data.addColumn({type: 'string', role: 'tooltip', p:{html:true}});
     data.addColumn('number', 'Amarelo'); data.addColumn({type: 'string', role: 'tooltip', p:{html:true}});
-    data.addColumn('number', 'Laranja'); data.addColumn({type: 'string', role: 'tooltip', p:{html:true}});
+    data.addColumn('number', 'Vermelho'); data.addColumn({type: 'string', role: 'tooltip', p:{html:true}});
 
     popHist.forEach((row,i)=>{
         const total = row.reduce((a,b)=>a+b,0) || 1;
@@ -254,7 +254,7 @@ window.onload = () => {
                 <div class="fitness-bar-container"><div class="fitness-bar" id="yellow-fitness">⚡0</div></div>
             </div>
             <div class="count-box red" id="red-box">
-                Laranja<br><span id="red-count">--</span>
+                Vermelho<br><span id="red-count">--</span>
                 <div class="fitness-bar-container"><div class="fitness-bar" id="red-fitness">⚡0</div></div>
             </div>
         </div>
