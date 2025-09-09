@@ -93,7 +93,11 @@ h2 { margin:0; text-align:center; font-size:1.5rem; }
         height: calc(100% - 50px); /* deixa espaço para last-event-box */
     }
     .counts-section { width:95%; margin-top:auto; } 
-    .counts-boxes { flex-direction:row; justify-content:space-around; flex-wrap:wrap; }
+    .counts-boxes { flex-direction:row; justify-content:space-around; flex-wrap:wrap; 
+                        #green-box  { order: 1; } /* top-left */
+                        #red-box    { order: 2; } /* top-right */
+                        #yellow-box { order: 3; } /* bottom-left */
+                        #blue-box   { order: 4; } /* bottom-right */}
     .count-box { flex:1 1 45%; font-size: 1.6rem; min-height:30px; margin-bottom:0.5rem; }
     .count-box span { font-size: 1.8rem; }
     .fitness-bar-container {
@@ -103,6 +107,7 @@ h2 { margin:0; text-align:center; font-size:1.5rem; }
         font-size: 1.2rem;     /* bigger ⚡ and value */
         padding-right: 12px;   /* space for text inside */
     }
+    .emoji { font-size:3.5rem; }
 }
 
 </style>
